@@ -1,4 +1,4 @@
-﻿package com.deepguard.scan.entity;
+package com.deepguard.scan.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,7 +1,10 @@
-﻿package com.deepguard.scan.entity;
+package com.deepguard.scan.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.auth.entity.User;
+import com.deepguard.media.entity.MediaFile;
+import com.deepguard.scan.enums.ScanJobStatus;
 
 import java.time.LocalDateTime;
 
@@ -40,5 +43,6 @@ public class ScanJob {
     private LocalDateTime finishedAt;
 
 }
+
 
 

@@ -1,7 +1,10 @@
-﻿package com.deepguard.media.entity;
+package com.deepguard.media.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.auth.entity.User;
+import com.deepguard.media.enums.FileType;
+import com.deepguard.media.enums.UploadStatus;
 
 import java.time.LocalDateTime;
 
@@ -54,5 +57,6 @@ public class MediaFile {
     }
 
 }
+
 
 

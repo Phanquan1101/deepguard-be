@@ -1,7 +1,8 @@
-﻿package com.deepguard.report.entity;
+package com.deepguard.report.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.report.enums.ExportType;
 
 import java.time.LocalDateTime;
 
@@ -38,5 +39,6 @@ public class ReportExport {
     }
 
 }
+
 
 

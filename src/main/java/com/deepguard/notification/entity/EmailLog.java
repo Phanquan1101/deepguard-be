@@ -1,7 +1,8 @@
-﻿package com.deepguard.notification.entity;
+package com.deepguard.notification.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.notification.enums.EmailStatus;
 
 import java.time.LocalDateTime;
 
@@ -33,5 +34,6 @@ public class EmailLog {
     private LocalDateTime sentAt;
 
 }
+
 
 

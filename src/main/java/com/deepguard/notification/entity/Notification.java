@@ -1,7 +1,9 @@
-﻿package com.deepguard.notification.entity;
+package com.deepguard.notification.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.auth.entity.User;
+import com.deepguard.notification.enums.NotificationType;
 
 import java.time.LocalDateTime;
 
@@ -44,5 +46,6 @@ public class Notification {
     }
 
 }
+
 
 

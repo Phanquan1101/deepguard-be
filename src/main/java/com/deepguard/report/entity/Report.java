@@ -1,7 +1,11 @@
-﻿package com.deepguard.report.entity;
+package com.deepguard.report.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.auth.entity.User;
+import com.deepguard.common.enums.RiskLevel;
+import com.deepguard.media.entity.MediaFile;
+import com.deepguard.scan.entity.ScanJob;
 
 import java.time.LocalDateTime;
 
@@ -46,5 +50,6 @@ public class Report {
     }
 
 }
+
 
 

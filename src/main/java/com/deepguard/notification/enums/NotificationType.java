@@ -1,5 +1,7 @@
-﻿package com.deepguard.notification.enums;
+package com.deepguard.notification.enums;
 
+import com.deepguard.billing.entity.Payment;
+import com.deepguard.notification.entity.Notification;
 public enum NotificationType {
     SYSTEM,
     PAYMENT,
@@ -7,5 +9,6 @@ public enum NotificationType {
     REPORT_READY,
     SECURITY
 }
+
 
 

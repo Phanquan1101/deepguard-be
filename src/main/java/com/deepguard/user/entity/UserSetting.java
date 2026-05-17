@@ -1,7 +1,8 @@
-﻿package com.deepguard.user.entity;
+package com.deepguard.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.auth.entity.User;
 
 @Entity
 @Table(name = "user_settings")
@@ -28,5 +29,6 @@ public class UserSetting {
     private Boolean notificationEnabled = true;
 
 }
+
 
 

@@ -1,4 +1,4 @@
-﻿package com.deepguard.billing.enums;
+package com.deepguard.billing.enums;
 
 public enum SubscriptionStatus {
     ACTIVE,

@@ -1,4 +1,4 @@
-﻿package com.deepguard.auth.entity;
+package com.deepguard.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,8 +13,7 @@ import lombok.*;
 public class Role {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String name;

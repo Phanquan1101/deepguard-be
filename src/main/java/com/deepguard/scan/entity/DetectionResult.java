@@ -1,7 +1,8 @@
-﻿package com.deepguard.scan.entity;
+package com.deepguard.scan.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.scan.enums.DetectionLabel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -45,5 +46,6 @@ public class DetectionResult {
     }
 
 }
+
 
 

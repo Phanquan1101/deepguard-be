@@ -1,7 +1,8 @@
-﻿package com.deepguard.user.entity;
+package com.deepguard.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.auth.entity.User;
 
 import java.time.LocalDateTime;
 
@@ -48,5 +49,6 @@ public class UserProfile {
     }
 
 }
+
 
 

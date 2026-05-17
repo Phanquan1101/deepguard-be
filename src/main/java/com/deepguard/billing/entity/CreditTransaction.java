@@ -1,7 +1,8 @@
-﻿package com.deepguard.billing.entity;
+package com.deepguard.billing.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.billing.enums.TransactionType;
 
 import java.time.LocalDateTime;
 
@@ -41,5 +42,6 @@ public class CreditTransaction {
     }
 
 }
+
 
 

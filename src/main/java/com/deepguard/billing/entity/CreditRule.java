@@ -1,7 +1,8 @@
-﻿package com.deepguard.billing.entity;
+package com.deepguard.billing.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.billing.enums.ActionType;
 
 @Entity
 @Table(name = "credit_rules")
@@ -30,5 +31,6 @@ public class CreditRule {
     private Boolean isActive = true;
 
 }
+
 
 

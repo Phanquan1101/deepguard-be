@@ -1,4 +1,4 @@
-﻿package com.deepguard.scan.enums;
+package com.deepguard.scan.enums;
 
 public enum DetectionLabel {
     REAL,

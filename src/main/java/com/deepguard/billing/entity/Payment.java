@@ -1,7 +1,9 @@
-﻿package com.deepguard.billing.entity;
+package com.deepguard.billing.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.deepguard.auth.entity.User;
+import com.deepguard.billing.enums.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -49,5 +51,6 @@ public class Payment {
     }
 
 }
+
 
 

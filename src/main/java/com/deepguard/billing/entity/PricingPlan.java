@@ -1,4 +1,4 @@
-﻿package com.deepguard.billing.entity;
+package com.deepguard.billing.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
