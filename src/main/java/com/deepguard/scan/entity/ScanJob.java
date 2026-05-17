@@ -7,6 +7,7 @@ import com.deepguard.media.entity.MediaFile;
 import com.deepguard.scan.enums.ScanJobStatus;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "scan_jobs")
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 public class ScanJob {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,6 +42,13 @@ public class ScanJob {
 
     @Column(name = "finished_at")
     private LocalDateTime finishedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
+    }
 
 }
 

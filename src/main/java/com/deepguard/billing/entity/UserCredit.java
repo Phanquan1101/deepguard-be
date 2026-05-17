@@ -5,6 +5,7 @@ import lombok.*;
 import com.deepguard.auth.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "credit_credits")
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class UserCredit {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -37,6 +38,9 @@ public class UserCredit {
 
     @PrePersist
     public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
         createdAt = LocalDateTime.now();
 
         if (remainingCredits == null) {

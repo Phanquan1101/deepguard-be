@@ -6,6 +6,7 @@ import com.deepguard.scan.enums.DetectionLabel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "detection_results")
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 public class DetectionResult {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -42,6 +43,9 @@ public class DetectionResult {
 
     @PrePersist
     public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
         processedAt = LocalDateTime.now();
     }
 

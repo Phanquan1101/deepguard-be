@@ -16,8 +16,8 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(name = "id", nullable = false)
+    private String id;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -46,6 +46,9 @@ public class User {
 
     @PrePersist
     public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
         createdAt = LocalDateTime.now();
     }
 

@@ -2,6 +2,7 @@ package com.deepguard.scan.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "detection_frames")
@@ -13,7 +14,7 @@ import lombok.*;
 public class DetectionFrame {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,6 +30,13 @@ public class DetectionFrame {
 
     @Column(name = "frame_image_url")
     private String frameImageUrl;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
+    }
 
 }
 

@@ -7,6 +7,7 @@ import com.deepguard.media.enums.FileType;
 import com.deepguard.media.enums.UploadStatus;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "media_files")
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 public class MediaFile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -53,6 +54,9 @@ public class MediaFile {
 
     @PrePersist
     public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
         uploadedAt = LocalDateTime.now();
     }
 

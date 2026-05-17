@@ -13,7 +13,8 @@ import lombok.*;
 public class Role {
 
     @Id
-    private Long id;
+    @Column(name = "id", nullable = false)
+    private String id;
 
     @Column(nullable = false, unique = true)
     private String name;

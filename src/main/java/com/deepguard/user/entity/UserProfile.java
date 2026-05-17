@@ -5,6 +5,7 @@ import lombok.*;
 import com.deepguard.auth.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user_profiles")
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class UserProfile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -40,6 +41,9 @@ public class UserProfile {
 
     @PrePersist
     public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
         createdAt = LocalDateTime.now();
     }
 

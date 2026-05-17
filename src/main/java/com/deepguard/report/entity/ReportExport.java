@@ -5,6 +5,7 @@ import lombok.*;
 import com.deepguard.report.enums.ExportType;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "report_exports")
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class ReportExport {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,6 +36,9 @@ public class ReportExport {
 
     @PrePersist
     public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
         createdAt = LocalDateTime.now();
     }
 

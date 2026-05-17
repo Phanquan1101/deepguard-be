@@ -5,6 +5,7 @@ import lombok.*;
 import com.deepguard.billing.enums.TransactionType;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "credit_transactions")
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class CreditTransaction {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,6 +39,9 @@ public class CreditTransaction {
 
     @PrePersist
     public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
         createdAt = LocalDateTime.now();
     }
 

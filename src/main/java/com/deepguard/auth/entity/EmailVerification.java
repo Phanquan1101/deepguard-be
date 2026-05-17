@@ -16,8 +16,8 @@ import java.util.UUID;
 public class EmailVerification {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(name = "id", nullable = false)
+    private String id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
@@ -28,6 +28,13 @@ public class EmailVerification {
 
     @Column(name = "expired_at", nullable = false)
     private LocalDateTime expiredAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
+    }
 
 }
 

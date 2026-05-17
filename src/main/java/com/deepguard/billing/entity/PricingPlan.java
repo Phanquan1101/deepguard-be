@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "pricing_plans")
@@ -15,7 +16,7 @@ import java.math.BigDecimal;
 public class PricingPlan {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @Column(nullable = false)
@@ -29,6 +30,13 @@ public class PricingPlan {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
+    }
 
 }
 

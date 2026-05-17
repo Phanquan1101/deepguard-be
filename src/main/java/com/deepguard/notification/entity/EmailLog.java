@@ -5,6 +5,7 @@ import lombok.*;
 import com.deepguard.notification.enums.EmailStatus;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "email_logs")
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class EmailLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,6 +33,13 @@ public class EmailLog {
 
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
+    }
 
 }
 

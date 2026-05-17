@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.UUID;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -57,7 +56,7 @@ public class CustomUserDetails implements UserDetails {
         return "ACTIVE".equalsIgnoreCase(user.getStatus());
     }
 
-    public UUID getId() {
+    public String getId() {
         return user.getId();
     }
 

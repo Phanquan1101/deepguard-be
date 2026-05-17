@@ -6,6 +6,7 @@ import com.deepguard.auth.entity.User;
 import com.deepguard.billing.enums.SubscriptionStatus;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "subscriptions")
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 public class Subscription {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,6 +38,13 @@ public class Subscription {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SubscriptionStatus status;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
+    }
 
 }
 

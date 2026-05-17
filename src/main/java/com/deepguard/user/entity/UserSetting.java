@@ -3,6 +3,7 @@ package com.deepguard.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import com.deepguard.auth.entity.User;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user_settings")
@@ -14,7 +15,7 @@ import com.deepguard.auth.entity.User;
 public class UserSetting {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -27,6 +28,13 @@ public class UserSetting {
 
     @Column(name = "notification_enabled", nullable = false)
     private Boolean notificationEnabled = true;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
+    }
 
 }
 

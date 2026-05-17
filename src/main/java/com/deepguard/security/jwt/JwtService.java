@@ -31,7 +31,7 @@ public class JwtService {
         Date expiration = new Date(now.getTime() + accessTokenExpirationMs);
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId() != null ? user.getId().toString() : null);
+        claims.put("userId", user.getId());
         claims.put("role", user.getRole() != null ? user.getRole().getName() : null);
 
         return Jwts.builder()
@@ -48,12 +48,8 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public UUID extractUserId(String token) {
-        String userId = extractClaim(token, claims -> claims.get("userId", String.class));
-        if (userId == null || userId.isBlank()) {
-            return null;
-        }
-        return UUID.fromString(userId);
+    public String extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", String.class));
     }
 
     public String extractRole(String token) {

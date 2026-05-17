@@ -8,6 +8,7 @@ import com.deepguard.media.entity.MediaFile;
 import com.deepguard.scan.entity.ScanJob;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "reports")
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 public class Report {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,6 +47,9 @@ public class Report {
 
     @PrePersist
     public void prePersist() {
+        if (id == null || id.isBlank()) {
+            id = UUID.randomUUID().toString();
+        }
         generatedAt = LocalDateTime.now();
     }
 
