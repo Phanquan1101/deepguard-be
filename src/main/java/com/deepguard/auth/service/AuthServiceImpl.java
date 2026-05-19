@@ -71,9 +71,7 @@ public class AuthServiceImpl implements AuthService {
 
         return authMapper.toAuthResponse(
                 accessToken,
-                refreshToken.getToken(),
-                jwtService.getAccessTokenExpirationSeconds(),
-                savedUser
+                refreshToken.getToken()
         );
     }
 
@@ -96,9 +94,7 @@ public class AuthServiceImpl implements AuthService {
 
         return authMapper.toAuthResponse(
                 accessToken,
-                refreshToken.getToken(),
-                jwtService.getAccessTokenExpirationSeconds(),
-                user
+                refreshToken.getToken()
         );
     }
 

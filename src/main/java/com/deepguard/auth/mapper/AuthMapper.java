@@ -24,13 +24,10 @@ public class AuthMapper {
                 .build();
     }
 
-    public AuthResponse toAuthResponse(String accessToken, String refreshToken, long expiresIn, User user) {
+    public AuthResponse toAuthResponse(String accessToken, String refreshToken) {
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .tokenType("Bearer")
-                .expiresIn(expiresIn)
-                .user(toUserAuthResponse(user))
                 .build();
     }
 
