@@ -27,7 +27,12 @@ public enum ErrorCode {
     ACCOUNT_DISABLED("ACCOUNT_DISABLED", "Account is disabled", HttpStatus.FORBIDDEN),
     ACCOUNT_NOT_VERIFIED("ACCOUNT_NOT_VERIFIED", "Account is not verified", HttpStatus.FORBIDDEN),
 
-    INVALID_VERIFICATION_CODE("INVALID_VERIFICATION_CODE", "Invalid verification code", HttpStatus.BAD_REQUEST);
+    INVALID_VERIFICATION_CODE("INVALID_VERIFICATION_CODE", "Invalid verification code", HttpStatus.BAD_REQUEST),
+
+    USER_PROFILE_ALREADY_EXISTS("USER_PROFILE_ALREADY_EXISTS", "User profile already exists", HttpStatus.CONFLICT),
+    USER_PROFILE_NOT_FOUND("USER_PROFILE_NOT_FOUND", "User profile not found", HttpStatus.NOT_FOUND),
+
+    FILE_UPLOAD_FAILED("FILE_UPLOAD_FAILED", "Failed to upload file", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
     private final String message;
