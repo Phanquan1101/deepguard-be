@@ -1,23 +1,28 @@
 package com.deepguard.auth.service;
 
+import com.deepguard.auth.bootstrap.EmailService;
 import com.deepguard.auth.dto.request.LoginRequest;
 import com.deepguard.auth.dto.request.LogoutRequest;
 import com.deepguard.auth.dto.request.RefreshTokenRequest;
 import com.deepguard.auth.dto.request.RegisterRequest;
 import com.deepguard.auth.dto.response.AuthResponse;
 import com.deepguard.auth.dto.response.RefreshTokenResponse;
+import com.deepguard.auth.dto.response.RegisterResponse;
 import com.deepguard.auth.dto.response.UserAuthResponse;
+import com.deepguard.auth.entity.EmailVerification;
 import com.deepguard.auth.entity.RefreshToken;
 import com.deepguard.auth.entity.Role;
 import com.deepguard.auth.entity.User;
 import com.deepguard.auth.enums.UserStatus;
 import com.deepguard.auth.mapper.AuthMapper;
+import com.deepguard.auth.repository.EmailVerificationRepository;
 import com.deepguard.auth.repository.RoleRepository;
 import com.deepguard.auth.repository.UserRepository;
 import com.deepguard.common.exception.BusinessException;
 import com.deepguard.common.exception.ErrorCode;
 import com.deepguard.security.jwt.JwtService;
 import com.deepguard.security.userdetails.CustomUserDetails;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -39,10 +45,12 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final AuthMapper authMapper;
+    private final EmailService emailService;
+    private final EmailVerificationRepository emailVerificationRepository;
 
     @Override
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) throws MessagingException {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
@@ -59,20 +67,28 @@ public class AuthServiceImpl implements AuthService {
                 .username(request.getUsername())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .role(role)
-                .isVerified(true)
+                .isVerified(false)
                 .status(UserStatus.ACTIVE.name())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(null)
                 .build();
 
         User savedUser = userRepository.save(user);
-        String accessToken = jwtService.generateAccessToken(savedUser);
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser);
 
-        return authMapper.toAuthResponse(
-                accessToken,
-                refreshToken.getToken()
-        );
+        // Generate otp and send email verification
+        String otp = generateOtp();
+        EmailVerification emailVerification = EmailVerification.builder()
+                .user(savedUser)
+                .verificationCode(otp)
+                .expiredAt(LocalDateTime.now().plusMinutes(10)) // OTP valid for 10 minutes
+                .build();
+        emailVerificationRepository.save(emailVerification);
+        emailService.sendOtp(savedUser.getEmail(), otp);
+
+        return RegisterResponse.builder()
+                .email(savedUser.getEmail())
+                .username(savedUser.getUsername())
+                .build();
     }
 
     @Override
@@ -87,6 +103,10 @@ public class AuthServiceImpl implements AuthService {
 
         if (!UserStatus.ACTIVE.name().equalsIgnoreCase(user.getStatus())) {
             throw new BusinessException(ErrorCode.ACCOUNT_DISABLED);
+        }
+
+        if (!user.getIsVerified()) {
+            throw new BusinessException(ErrorCode.ACCOUNT_NOT_VERIFIED);
         }
 
         String accessToken = jwtService.generateAccessToken(user);
@@ -129,5 +149,15 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
         return authMapper.toUserAuthResponse(principal.getUser());
+    }
+
+    private String generateOtp() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder code = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 6; i++) {
+            code.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return code.toString();
     }
 }
