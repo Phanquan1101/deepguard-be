@@ -6,9 +6,11 @@ import com.deepguard.auth.dto.request.RefreshTokenRequest;
 import com.deepguard.auth.dto.request.RegisterRequest;
 import com.deepguard.auth.dto.response.AuthResponse;
 import com.deepguard.auth.dto.response.RefreshTokenResponse;
+import com.deepguard.auth.dto.response.RegisterResponse;
 import com.deepguard.auth.dto.response.UserAuthResponse;
 import com.deepguard.auth.service.AuthService;
 import com.deepguard.common.response.ApiResponse;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +28,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponse response = authService.register(request);
-        return ResponseEntity.ok(ApiResponse.success(response));
+    public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
+        RegisterResponse response = authService.register(request);
+        return ResponseEntity.ok(ApiResponse.success("User registered successfully. Please check your email for the OTP to verify your account.", response));
     }
 
     @PostMapping("/login")

@@ -6,11 +6,13 @@ import com.deepguard.auth.dto.request.RefreshTokenRequest;
 import com.deepguard.auth.dto.request.RegisterRequest;
 import com.deepguard.auth.dto.response.AuthResponse;
 import com.deepguard.auth.dto.response.RefreshTokenResponse;
+import com.deepguard.auth.dto.response.RegisterResponse;
 import com.deepguard.auth.dto.response.UserAuthResponse;
+import jakarta.mail.MessagingException;
 
 public interface AuthService {
 
-    AuthResponse register(RegisterRequest request);
+    RegisterResponse register(RegisterRequest request) throws MessagingException;
 
     AuthResponse login(LoginRequest request);
 

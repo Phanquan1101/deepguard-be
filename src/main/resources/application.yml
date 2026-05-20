@@ -31,6 +31,19 @@ spring:
       org.hibernate.SQL: DEBUG
       org.hibernate.orm.jdbc.bind: TRACE
 
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 app:
   security:
     jwt:

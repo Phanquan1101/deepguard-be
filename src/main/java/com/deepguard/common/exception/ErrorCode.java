@@ -25,7 +25,9 @@ public enum ErrorCode {
     REFRESH_TOKEN_EXPIRED("REFRESH_TOKEN_EXPIRED", "Refresh token has expired", HttpStatus.UNAUTHORIZED),
     REFRESH_TOKEN_REVOKED("REFRESH_TOKEN_REVOKED", "Refresh token has been revoked", HttpStatus.UNAUTHORIZED),
     ACCOUNT_DISABLED("ACCOUNT_DISABLED", "Account is disabled", HttpStatus.FORBIDDEN),
-    ACCOUNT_NOT_VERIFIED("ACCOUNT_NOT_VERIFIED", "Account is not verified", HttpStatus.FORBIDDEN);
+    ACCOUNT_NOT_VERIFIED("ACCOUNT_NOT_VERIFIED", "Account is not verified", HttpStatus.FORBIDDEN),
+
+    INVALID_VERIFICATION_CODE("INVALID_VERIFICATION_CODE", "Invalid verification code", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;
