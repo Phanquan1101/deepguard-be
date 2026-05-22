@@ -32,9 +32,6 @@ public class MediaFile {
     @Column(name = "original_url", nullable = false, columnDefinition = "TEXT")
     private String originalUrl;
 
-    @Column(name = "thumbnail_url", columnDefinition = "TEXT")
-    private String thumbnailUrl;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "file_type", nullable = false)
     private FileType fileType;

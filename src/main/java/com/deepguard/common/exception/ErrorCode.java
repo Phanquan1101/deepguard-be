@@ -32,7 +32,10 @@ public enum ErrorCode {
     USER_PROFILE_ALREADY_EXISTS("USER_PROFILE_ALREADY_EXISTS", "User profile already exists", HttpStatus.CONFLICT),
     USER_PROFILE_NOT_FOUND("USER_PROFILE_NOT_FOUND", "User profile not found", HttpStatus.NOT_FOUND),
 
-    FILE_UPLOAD_FAILED("FILE_UPLOAD_FAILED", "Failed to upload file", HttpStatus.INTERNAL_SERVER_ERROR);
+    FILE_UPLOAD_FAILED("FILE_UPLOAD_FAILED", "Failed to upload file", HttpStatus.INTERNAL_SERVER_ERROR),
+    MEDIA_NOT_USER("MEDIA_NOT_USER", "Media file does not belong to the user", HttpStatus.FORBIDDEN),
+    INVALID_MEDIA_URL("INVALID_MEDIA_URL", "Invalid media URL", HttpStatus.BAD_REQUEST),
+    MEDIA_NOT_FOUND("MEDIA_NOT_FOUND", "Media file not found", HttpStatus.NOT_FOUND);
 
     private final String code;
     private final String message;
