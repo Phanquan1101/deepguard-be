@@ -21,10 +21,29 @@ import java.util.UUID;
 @Slf4j
 public class SupabaseStorageService {
 
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-    private static final List<String> ALLOWED_CONTENT_TYPES = Arrays.asList(
-            "image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"
-    );
+    private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final long MAX_VIDEO_SIZE = 100 * 1024 * 1024;
+    private static final long MAX_AUDIO_SIZE = 20 * 1024 * 1024;
+    private static final List<String> ALLOWED_CONTENT_TYPES =
+            Arrays.asList(
+
+                    // images
+                    "image/jpeg",
+                    "image/png",
+                    "image/gif",
+                    "image/webp",
+                    "image/avif",
+
+                    // videos
+                    "video/mp4",
+                    "video/webm",
+                    "video/quicktime",
+
+                    // audios
+                    "audio/mpeg",
+                    "audio/wav",
+                    "audio/mp3"
+            );
 
     private final SupabaseStorageConfig storageConfig;
     private final RestTemplate supabaseRestTemplate;
@@ -113,16 +132,34 @@ public class SupabaseStorageService {
             throw new BusinessException(ErrorCode.FILE_UPLOAD_FAILED, "File is empty");
         }
 
-        if (file.getSize() > MAX_FILE_SIZE) {
-            throw new BusinessException(ErrorCode.FILE_UPLOAD_FAILED,
-                    "File size exceeds maximum allowed size of 5MB");
+        String contentType = file.getContentType();
+        long maxSize = getMaxSize(contentType);
+
+        if (file.getSize() > maxSize) {
+            throw new BusinessException(
+                    ErrorCode.FILE_UPLOAD_FAILED,
+                    "File size exceeded"
+            );
+        }
+    }
+
+    private long getMaxSize(String contentType) {
+        long maxSize;
+
+        if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
+            throw new BusinessException(ErrorCode.FILE_UPLOAD_FAILED, "Unsupported file type");
         }
 
-        String contentType = file.getContentType();
-        if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
-            throw new BusinessException(ErrorCode.FILE_UPLOAD_FAILED,
-                    "Invalid file type. Allowed types: JPEG, PNG, GIF, WebP");
+        if (contentType.startsWith("image/")) {
+            maxSize = MAX_IMAGE_SIZE;
+        } else if (contentType.startsWith("video/")) {
+            maxSize = MAX_VIDEO_SIZE;
+        } else if (contentType.startsWith("audio/")) {
+            maxSize = MAX_AUDIO_SIZE;
+        } else {
+            throw new BusinessException(ErrorCode.FILE_UPLOAD_FAILED, "Unsupported file type");
         }
+        return maxSize;
     }
 
     private String getFileExtension(String filename) {

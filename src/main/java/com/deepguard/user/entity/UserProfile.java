@@ -3,6 +3,8 @@ package com.deepguard.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import com.deepguard.auth.entity.User;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -34,16 +36,13 @@ public class UserProfile {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 
 }
 
