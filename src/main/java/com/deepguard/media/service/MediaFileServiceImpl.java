@@ -221,4 +221,23 @@ public class MediaFileServiceImpl implements MediaFileService {
                 .last(mediaPage.isLast())
                 .build();
     }
+
+    /**
+     * Retrieves a media file by its ID if it belongs to the currently authenticated user.
+     *
+     * @param mediaFileId the ID of the media file to retrieve
+     * @return a MediaFileResponse object representing the retrieved media file
+     */
+    @Override
+    public MediaFileResponse getMyMediaFileById(String mediaFileId) {
+        User currentUser = getCurrentAuthenticatedUser();
+        MediaFile mediaFile = mediaFileRepository.findByIdAndUserId(mediaFileId, currentUser.getId());
+        if (mediaFile == null) {
+            throw new BusinessException(ErrorCode.MEDIA_NOT_FOUND);
+        }
+        if (!mediaFile.getUser().getId().equals(currentUser.getId())) {
+            throw new BusinessException(ErrorCode.MEDIA_NOT_USER);
+        }
+        return toMediaFileMapper.mapToMediaFileResponse(mediaFile);
+    }
 }

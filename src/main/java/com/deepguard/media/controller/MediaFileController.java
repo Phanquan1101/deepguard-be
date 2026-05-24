@@ -52,4 +52,10 @@ public class MediaFileController {
         return ResponseEntity.ok(ApiResponse.success("Delete media file successfully", mediaFileResponse));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<MediaFileResponse>> getMedia(@PathVariable String id) {
+        MediaFileResponse mediaFileResponse = mediaFileService.getMyMediaFileById(id);
+        return ResponseEntity.ok(ApiResponse.success("Get media file successfully", mediaFileResponse));
+    }
+
 }
