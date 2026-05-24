@@ -65,4 +65,24 @@ app:
     url: ${SUPABASE_URL}
     service-key: ${SUPABASE_SERVICE_KEY}
     bucket-name: ${SUPABASE_BUCKET_NAME:deepguard-storage}
+  payment:
+    vnpay:
+      tmn-code: ${VNPAY_TMN_CODE}
+      hash-secret: ${VNPAY_HASH_SECRET}
+      pay-url: ${VNPAY_PAY_URL:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+      return-url: ${VNPAY_RETURN_URL:http://localhost:5173/payment/vnpay-return}
+      ipn-url: ${VNPAY_IPN_URL:http://localhost:8080/api/billing/payments/vnpay/ipn}
+      version: ${VNPAY_VERSION:2.1.0}
+      command: ${VNPAY_COMMAND:pay}
+      order-type: ${VNPAY_ORDER_TYPE:other}
+      curr-code: ${VNPAY_CURR_CODE:VND}
+      locale: ${VNPAY_LOCALE:vn}
+    sepay:
+      webhook-secret: ${SEPAY_WEBHOOK_SECRET}
+      bank-code: ${SEPAY_BANK_CODE}
+      bank-account-no: ${SEPAY_BANK_ACCOUNT_NO}
+      bank-account-name: ${SEPAY_BANK_ACCOUNT_NAME}
+      qr-template: ${SEPAY_QR_TEMPLATE:compact2}
+      qr-base-url: ${SEPAY_QR_BASE_URL:https://img.vietqr.io/image}
+      transfer-content-prefix: ${SEPAY_TRANSFER_CONTENT_PREFIX:SEPAY}
 
