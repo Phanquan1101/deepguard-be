@@ -77,4 +77,12 @@ app:
       order-type: ${VNPAY_ORDER_TYPE:other}
       curr-code: ${VNPAY_CURR_CODE:VND}
       locale: ${VNPAY_LOCALE:vn}
+    sepay:
+      webhook-secret: ${SEPAY_WEBHOOK_SECRET}
+      bank-code: ${SEPAY_BANK_CODE}
+      bank-account-no: ${SEPAY_BANK_ACCOUNT_NO}
+      bank-account-name: ${SEPAY_BANK_ACCOUNT_NAME}
+      qr-template: ${SEPAY_QR_TEMPLATE:compact2}
+      qr-base-url: ${SEPAY_QR_BASE_URL:https://img.vietqr.io/image}
+      transfer-content-prefix: ${SEPAY_TRANSFER_CONTENT_PREFIX:SEPAY}
 
