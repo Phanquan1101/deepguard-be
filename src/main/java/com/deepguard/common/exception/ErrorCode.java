@@ -35,7 +35,10 @@ public enum ErrorCode {
     FILE_UPLOAD_FAILED("FILE_UPLOAD_FAILED", "Failed to upload file", HttpStatus.INTERNAL_SERVER_ERROR),
     MEDIA_NOT_USER("MEDIA_NOT_USER", "Media file does not belong to the user", HttpStatus.FORBIDDEN),
     INVALID_MEDIA_URL("INVALID_MEDIA_URL", "Invalid media URL", HttpStatus.BAD_REQUEST),
-    MEDIA_NOT_FOUND("MEDIA_NOT_FOUND", "Media file not found", HttpStatus.NOT_FOUND);
+    MEDIA_NOT_FOUND("MEDIA_NOT_FOUND", "Media file not found", HttpStatus.NOT_FOUND),
+
+    AI_SERVER_UNAVAILABLE("AI_SERVER_UNAVAILABLE", "AI server is unavailable", HttpStatus.SERVICE_UNAVAILABLE),
+    AI_DETECTION_FAILED("AI_DETECTION_FAILED", "AI detection failed", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
     private final String message;

@@ -11,8 +11,11 @@ import com.deepguard.media.enums.FileType;
 import com.deepguard.media.enums.UploadStatus;
 import com.deepguard.media.mapper.ToMediaFileMapper;
 import com.deepguard.media.repository.MediaFileRepository;
+import com.deepguard.scan.dto.response.AIDetectResponse;
+import com.deepguard.scan.service.ScanService;
 import com.deepguard.security.userdetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +30,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MediaFileServiceImpl implements MediaFileService {
 
     private static final String IMAGE_FOLDER = "image";
@@ -36,6 +40,7 @@ public class MediaFileServiceImpl implements MediaFileService {
     private final MediaFileRepository mediaFileRepository;
     private final SupabaseStorageService supabaseStorageService;
     private final ToMediaFileMapper toMediaFileMapper;
+    private final ScanService scanService;
 
     private User getCurrentAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -71,6 +76,16 @@ public class MediaFileServiceImpl implements MediaFileService {
                 .build();
         MediaFile savedMediaFile = mediaFileRepository.save(mediaFile);
 
+        // After saving, create scan job and run detection via ScanService
+        AIDetectResponse aiResponse = null;
+        try {
+            if (fileType == FileType.IMAGE) {
+                aiResponse = scanService.createScanJobAndResult(savedMediaFile, publicUrl, currentUser);
+            }
+        } catch (Exception e) {
+            log.warn("AI detection/persist failed for {}: {}", publicUrl, e.getMessage());
+        }
+
         return MediaFileResponse.builder()
                 .id(savedMediaFile.getId())
                 .userId(savedMediaFile.getUser().getId())
@@ -79,6 +94,7 @@ public class MediaFileServiceImpl implements MediaFileService {
                 .fileType(savedMediaFile.getFileType().name())
                 .fileSize(savedMediaFile.getFileSize())
                 .uploadedAt(savedMediaFile.getUploadedAt())
+                .aiDetect(aiResponse)
                 .build();
     }
 

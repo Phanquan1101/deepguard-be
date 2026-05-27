@@ -86,3 +86,6 @@ app:
       qr-base-url: ${SEPAY_QR_BASE_URL:https://img.vietqr.io/image}
       transfer-content-prefix: ${SEPAY_TRANSFER_CONTENT_PREFIX:SEPAY}
 
+  ai:
+    python-server-url: ${AI_PYTHON_SERVER_URL:https://squeezing-headdress-passably.ngrok-free.dev}
+
