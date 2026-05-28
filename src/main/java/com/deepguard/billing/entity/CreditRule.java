@@ -34,16 +34,6 @@ public class CreditRule {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @Column(name = "remaining_credits")
-    private Integer remainingCredits;
-
-    @Column(name = "used_credits")
-    private Integer usedCredits;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

@@ -38,7 +38,10 @@ public enum ErrorCode {
     MEDIA_NOT_FOUND("MEDIA_NOT_FOUND", "Media file not found", HttpStatus.NOT_FOUND),
 
     AI_SERVER_UNAVAILABLE("AI_SERVER_UNAVAILABLE", "AI server is unavailable", HttpStatus.SERVICE_UNAVAILABLE),
-    AI_DETECTION_FAILED("AI_DETECTION_FAILED", "AI detection failed", HttpStatus.INTERNAL_SERVER_ERROR);
+    AI_DETECTION_FAILED("AI_DETECTION_FAILED", "AI detection failed", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    CREDIT_INSUFFICIENT("CREDIT_INSUFFICIENT", "Insufficient credits", HttpStatus.BAD_REQUEST)
+    ;
 
     private final String code;
     private final String message;
