@@ -49,4 +49,6 @@ public interface MediaFileRepository extends JpaRepository<MediaFile, String> {
     Page<MediaFile> findAllWithFilters(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
     MediaFile findByIdAndUserId(String id, String userId);
+
+    long countByUserId(String userId);
 }

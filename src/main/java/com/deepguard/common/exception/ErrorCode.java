@@ -40,7 +40,10 @@ public enum ErrorCode {
     AI_SERVER_UNAVAILABLE("AI_SERVER_UNAVAILABLE", "AI server is unavailable", HttpStatus.SERVICE_UNAVAILABLE),
     AI_DETECTION_FAILED("AI_DETECTION_FAILED", "AI detection failed", HttpStatus.INTERNAL_SERVER_ERROR),
 
-    CREDIT_INSUFFICIENT("CREDIT_INSUFFICIENT", "Insufficient credits", HttpStatus.BAD_REQUEST)
+    CREDIT_INSUFFICIENT("CREDIT_INSUFFICIENT", "Insufficient credits", HttpStatus.BAD_REQUEST),
+
+    SCAN_JOB_NOT_FOUND("SCAN_JOB_NOT_FOUND", "Scan job not found", HttpStatus.NOT_FOUND),
+    REPORT_EXPORT_FAILED("REPORT_EXPORT_FAILED", "Failed to generate PDF report", HttpStatus.INTERNAL_SERVER_ERROR)
     ;
 
     private final String code;
