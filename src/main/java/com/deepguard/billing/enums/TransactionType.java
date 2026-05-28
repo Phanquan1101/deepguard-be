@@ -4,7 +4,8 @@ public enum TransactionType {
     PURCHASE,
     USAGE,
     REFUND,
-    BONUS
+    BONUS,
+    REFILL
 }
 
 

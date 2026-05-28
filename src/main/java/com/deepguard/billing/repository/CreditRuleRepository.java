@@ -12,4 +12,6 @@ public interface CreditRuleRepository extends JpaRepository<CreditRule, String> 
     Optional<CreditRule> findFirstByActionTypeAndIsActiveTrue(ActionType actionType);
 
     List<CreditRule> findByIsActiveTrue();
+
+    CreditRule findByActionTypeAndIsActiveTrue(ActionType actionType);
 }

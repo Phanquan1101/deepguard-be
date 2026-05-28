@@ -20,7 +20,7 @@ public class UserCredit {
     @Column(name = "id", nullable = false)
     private String id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 

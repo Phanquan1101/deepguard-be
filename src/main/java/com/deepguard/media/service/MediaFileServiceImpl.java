@@ -1,6 +1,8 @@
 package com.deepguard.media.service;
 
 import com.deepguard.auth.entity.User;
+import com.deepguard.billing.enums.ActionType;
+import com.deepguard.billing.service.UserCreditService;
 import com.deepguard.common.exception.BusinessException;
 import com.deepguard.common.exception.ErrorCode;
 import com.deepguard.common.response.PageResponse;
@@ -12,7 +14,8 @@ import com.deepguard.media.enums.UploadStatus;
 import com.deepguard.media.mapper.ToMediaFileMapper;
 import com.deepguard.media.repository.MediaFileRepository;
 import com.deepguard.scan.dto.response.AIDetectResponse;
-import com.deepguard.scan.service.ScanService;
+import com.deepguard.scan.service.ScanJobService;
+import com.deepguard.scan.service.ScanJobServiceImpl;
 import com.deepguard.security.userdetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +43,8 @@ public class MediaFileServiceImpl implements MediaFileService {
     private final MediaFileRepository mediaFileRepository;
     private final SupabaseStorageService supabaseStorageService;
     private final ToMediaFileMapper toMediaFileMapper;
-    private final ScanService scanService;
+    private final ScanJobService scanJobService;
+    private final UserCreditService userCreditService;
 
     private User getCurrentAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -59,43 +63,67 @@ public class MediaFileServiceImpl implements MediaFileService {
     @Override
     public MediaFileResponse uploadFile(MultipartFile file) {
         User currentUser = getCurrentAuthenticatedUser();
+
         String contentType = file.getContentType();
         String folder = determineFolder(contentType);
         FileType fileType = determineFileType(contentType);
 
-        String publicUrl = supabaseStorageService.uploadFile(file, folder);
-
-        MediaFile mediaFile = MediaFile.builder()
-                .user(currentUser)
-                .fileName(file.getOriginalFilename())
-                .originalUrl(publicUrl)
-                .fileType(fileType)
-                .fileSize(file.getSize())
-                .uploadStatus(UploadStatus.COMPLETED)
-                .uploadedAt(LocalDateTime.now())
-                .build();
-        MediaFile savedMediaFile = mediaFileRepository.save(mediaFile);
-
-        // After saving, create scan job and run detection via ScanService
-        AIDetectResponse aiResponse = null;
-        try {
-            if (fileType == FileType.IMAGE) {
-                aiResponse = scanService.createScanJobAndResult(savedMediaFile, publicUrl, currentUser);
-            }
-        } catch (Exception e) {
-            log.warn("AI detection/persist failed for {}: {}", publicUrl, e.getMessage());
+        if (fileType == FileType.IMAGE) {
+            userCreditService.validateEnoughCredits(currentUser, ActionType.IMAGE_SCAN);
         }
 
-        return MediaFileResponse.builder()
-                .id(savedMediaFile.getId())
-                .userId(savedMediaFile.getUser().getId())
-                .fileName(savedMediaFile.getFileName())
-                .originalUrl(savedMediaFile.getOriginalUrl())
-                .fileType(savedMediaFile.getFileType().name())
-                .fileSize(savedMediaFile.getFileSize())
-                .uploadedAt(savedMediaFile.getUploadedAt())
-                .aiDetect(aiResponse)
-                .build();
+        String publicUrl = null;
+
+        try {
+            // UPLOAD FILE
+            publicUrl = supabaseStorageService.uploadFile(file, folder);
+
+            // SAVE MEDIA
+            MediaFile mediaFile = MediaFile.builder()
+                    .user(currentUser)
+                    .fileName(file.getOriginalFilename())
+                    .originalUrl(publicUrl)
+                    .fileType(fileType)
+                    .fileSize(file.getSize())
+                    .uploadStatus(UploadStatus.COMPLETED)
+                    .uploadedAt(LocalDateTime.now())
+                    .build();
+
+            MediaFile savedMediaFile = mediaFileRepository.save(mediaFile);
+
+            // CONSUME CREDIT AFTER SUCCESSFUL UPLOAD
+            if (fileType == FileType.IMAGE) {
+                userCreditService.consumeCredits(currentUser, ActionType.IMAGE_SCAN);
+            }
+
+            // AI DETECT
+            AIDetectResponse aiResponse = null;
+
+            if (fileType == FileType.IMAGE) {
+                aiResponse = scanJobService.createScanJobAndResult(savedMediaFile, publicUrl, currentUser);
+            }
+
+            return MediaFileResponse.builder()
+                    .id(savedMediaFile.getId())
+                    .userId(savedMediaFile.getUser().getId())
+                    .fileName(savedMediaFile.getFileName())
+                    .originalUrl(savedMediaFile.getOriginalUrl())
+                    .fileType(savedMediaFile.getFileType().name())
+                    .fileSize(savedMediaFile.getFileSize())
+                    .uploadedAt(savedMediaFile.getUploadedAt())
+                    .aiDetect(aiResponse)
+                    .build();
+
+        } catch (Exception e) {
+
+            log.error("Upload or AI detection failed: {}", e.getMessage());
+
+            // REFUND IF CREDIT ALREADY CONSUMED
+            if (fileType == FileType.IMAGE) {
+                userCreditService.refundCredit(currentUser, ActionType.IMAGE_SCAN);
+            }
+            throw new RuntimeException("Upload or AI detection failed", e);
+        }
     }
 
     private String determineFolder(String contentType) {

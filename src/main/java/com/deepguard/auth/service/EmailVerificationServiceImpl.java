@@ -6,6 +6,7 @@ import com.deepguard.auth.entity.EmailVerification;
 import com.deepguard.auth.entity.User;
 import com.deepguard.auth.repository.EmailVerificationRepository;
 import com.deepguard.auth.repository.UserRepository;
+import com.deepguard.billing.service.UserCreditService;
 import com.deepguard.common.exception.BusinessException;
 import com.deepguard.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     private final UserRepository userRepository;
     private final EmailVerificationRepository emailVerificationRepository;
+
+    private final UserCreditService userCreditService;
 
     @Override
     public EmailVerificationResponse verifyEmail(EmailVerificationRequest emailVerificationRequest) {
@@ -35,6 +38,9 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         user.setIsVerified(true);
         userRepository.save(user);
         emailVerificationRepository.delete(emailVerification);
+
+        userCreditService.grantWelcomeBonus(user);
+
         return EmailVerificationResponse.builder()
                 .email(user.getEmail())
                 .build();
