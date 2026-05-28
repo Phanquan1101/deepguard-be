@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DetectionResultRepository extends JpaRepository<DetectionResult, String> {
@@ -25,4 +26,6 @@ public interface DetectionResultRepository extends JpaRepository<DetectionResult
             "scanJob.user"
     })
     Page<DetectionResult> findAllByResultLabel(DetectionLabel resultLabel, Pageable pageable);
+
+    Optional<DetectionResult> findByScanJobId(String scanJobId);
 }
