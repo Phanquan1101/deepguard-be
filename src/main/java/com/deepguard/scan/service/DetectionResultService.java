@@ -10,4 +10,5 @@ import java.util.List;
 public interface DetectionResultService {
     List<DetectionResultResponse> getMyDetectionResults();
     PageResponse<DetectionResultResponse> getAllDetectionResults(Integer page, Integer size, DetectionLabel label);
+    DetectionResultResponse getDetailDetectionResult(String scanJobId);
 }

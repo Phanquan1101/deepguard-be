@@ -77,7 +77,7 @@ public class DetectionResultServiceImpl implements DetectionResultService {
                     .findAllByResultLabel(label, pageable);
         } else {
             detectionPage = detectionResultRepository
-                    .findAll(pageable);
+                    .findAllDetectionResult(pageable);
         }
         List<DetectionResultResponse> content = detectionPage.getContent()
                 .stream()
@@ -91,6 +91,18 @@ public class DetectionResultServiceImpl implements DetectionResultService {
                 .totalPages(detectionPage.getTotalPages())
                 .last(detectionPage.isLast())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public DetectionResultResponse getDetailDetectionResult(String scanJobId) {
+        User currentUser = getCurrentAuthenticatedUser();
+        DetectionResult detectionResult = detectionResultRepository.findByScanJobId(scanJobId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.DETECTION_RESULT_NOT_FOUND));
+        if (!detectionResult.getScanJob().getUser().getId().equals(currentUser.getId())) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+        return mapToResponse(detectionResult);
     }
 
     private DetectionResultResponse mapToResponse(DetectionResult detection) {
