@@ -43,7 +43,9 @@ public enum ErrorCode {
     CREDIT_INSUFFICIENT("CREDIT_INSUFFICIENT", "Insufficient credits", HttpStatus.BAD_REQUEST),
 
     SCAN_JOB_NOT_FOUND("SCAN_JOB_NOT_FOUND", "Scan job not found", HttpStatus.NOT_FOUND),
-    REPORT_EXPORT_FAILED("REPORT_EXPORT_FAILED", "Failed to generate PDF report", HttpStatus.INTERNAL_SERVER_ERROR)
+    REPORT_EXPORT_FAILED("REPORT_EXPORT_FAILED", "Failed to generate PDF report", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    DETECTION_RESULT_NOT_FOUND("DETECTION_RESULT_NOT_FOUND", "Detection result not found", HttpStatus.NOT_FOUND)
     ;
 
     private final String code;

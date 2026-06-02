@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,6 +27,14 @@ public interface DetectionResultRepository extends JpaRepository<DetectionResult
             "scanJob.user"
     })
     Page<DetectionResult> findAllByResultLabel(DetectionLabel resultLabel, Pageable pageable);
+
+    @EntityGraph(attributePaths = {
+            "scanJob",
+            "scanJob.mediaFile",
+            "scanJob.user"
+    })
+    @Query("SELECT dr FROM DetectionResult dr")
+    Page<DetectionResult> findAllDetectionResult(Pageable pageable);
 
     Optional<DetectionResult> findByScanJobId(String scanJobId);
 }
