@@ -28,8 +28,8 @@ public class ToMediaFileMapper {
 
             if (dr != null) {
                 aiDetect = AIDetectResponse.builder()
-                        .label(dr.getResultLabel() != null ? dr.getResultLabel().name().toLowerCase() : null)
-                        .score(dr.getConfidence() != null ? dr.getConfidence().doubleValue() : null)
+                        .prediction(dr.getResultLabel() != null ? dr.getResultLabel().name().toLowerCase() : null)
+                        .realProbability(dr.getConfidence() != null ? dr.getConfidence().doubleValue() : null)
                         .imageUrl(null)
                         .message(dr.getModelVersion())
                         .build();

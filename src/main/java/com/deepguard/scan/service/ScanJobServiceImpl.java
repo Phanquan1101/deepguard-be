@@ -83,14 +83,28 @@ public class ScanJobServiceImpl implements ScanJobService {
             entityManager.persist(scanJob);
 
             if (aiResponse != null) {
-                double score = aiResponse.getScore() != null ? aiResponse.getScore() : 0.0;
-                BigDecimal bdScore = BigDecimal.valueOf(score).setScale(2, RoundingMode.HALF_UP);
-                DetectionLabel labelEnum = (aiResponse.getLabel() != null && aiResponse.getLabel().toLowerCase().contains("fake")) ? DetectionLabel.FAKE : DetectionLabel.REAL;
+                double fakeScore = aiResponse.getFakeProbability() != null
+                        ? aiResponse.getFakeProbability()
+                        : 0.0;
+
+                BigDecimal bdFakeScore = BigDecimal.valueOf(fakeScore)
+                        .setScale(2, RoundingMode.HALF_UP);
+
+                BigDecimal bdConfidence = BigDecimal.valueOf(
+                        aiResponse.getRealProbability() != null
+                                ? aiResponse.getRealProbability()
+                                : 1.0 - fakeScore
+                ).setScale(2, RoundingMode.HALF_UP);
+                DetectionLabel labelEnum =
+                        aiResponse.getPrediction() != null
+                                && aiResponse.getPrediction().equalsIgnoreCase("FAKE")
+                                ? DetectionLabel.FAKE
+                                : DetectionLabel.REAL;
 
                 DetectionResult detectionResult = DetectionResult.builder()
                         .scanJob(scanJob)
-                        .fakeScore(bdScore)
-                        .confidence(bdScore)
+                        .fakeScore(bdFakeScore)
+                        .confidence(bdConfidence)
                         .resultLabel(labelEnum)
                         .modelVersion(aiResponse.getMessage() != null ? aiResponse.getMessage() : "unknown")
                         .processedAt(LocalDateTime.now())

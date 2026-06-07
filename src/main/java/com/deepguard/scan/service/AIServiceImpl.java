@@ -53,10 +53,10 @@ public class AIServiceImpl implements AIService {
             );
 
             AIDetectResponse result = response.getBody();
-            log.info("AI detection result for '{}': label={}, score={}",
-                    file.getOriginalFilename(),
-                    result != null ? result.getLabel() : "null",
-                    result != null ? result.getScore() : "null");
+//            log.info("AI detection result for '{}': label={}, score={}",
+//                    file.getOriginalFilename(),
+//                    result != null ? result.getLabel() : "null",
+//                    result != null ? result.getScore() : "null");
 
             return result;
 
@@ -103,10 +103,10 @@ public class AIServiceImpl implements AIService {
             log.info("AI response status={} body={}", response.getStatusCode().value(), response.getBody());
 
             AIDetectResponse result = response.getBody();
-            log.info("AI detection result for URL '{}': label={}, score={}",
-                    imageUrl,
-                    result != null ? result.getLabel() : "null",
-                    result != null ? result.getScore() : "null");
+//            log.info("AI detection result for URL '{}': label={}, score={}",
+//                    imageUrl,
+//                    result != null ? result.getLabel() : "null",
+//                    result != null ? result.getScore() : "null");
 
             return result;
 

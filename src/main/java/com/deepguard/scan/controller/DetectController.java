@@ -33,7 +33,7 @@ public class DetectController {
     ) {
         AIDetectResponse result = aiService.detect(file);
         // quick console output for debugging score
-        System.out.println("AI SCORE (detect): " + (result != null ? result.getScore() : "null"));
+        // System.out.println("AI SCORE (detect): " + (result != null ? result.getScore() : "null"));
         return ResponseEntity.ok(ApiResponse.success("AI detection completed successfully", result));
     }
 
@@ -67,9 +67,9 @@ public class DetectController {
             throw e; // rethrow so GlobalExceptionHandler handles it and client gets error response
         }
 
-        log.info("AI detection completed: label={}, score={}", result.getLabel(), result.getScore());
+        // log.info("AI detection completed: label={}, score={}", result.getLabel(), result.getScore());
         // quick console output for debugging score
-        System.out.println("AI SCORE (detect-with-upload): " + (result != null ? result.getScore() : "null"));
+        // System.out.println("AI SCORE (detect-with-upload): " + (result != null ? result.getScore() : "null"));
         return ResponseEntity.ok(ApiResponse.success("AI detection completed successfully", result));
     }
 }
