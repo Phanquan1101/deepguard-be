@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
@@ -90,4 +90,3 @@ app:
 
   ai:
     python-server-url: ${AI_PYTHON_SERVER_URL:https://squeezing-headdress-passably.ngrok-free.dev}
-

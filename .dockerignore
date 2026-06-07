@@ -1,0 +1,10 @@
+.idea
+.vscode
+target
+.git
+.gitignore
+*.iml
+*.log
+README.md
+mvnw
+mvnw.cmd
