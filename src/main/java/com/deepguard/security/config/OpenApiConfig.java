@@ -20,7 +20,7 @@ public class OpenApiConfig {
 
         return new OpenAPI()
                 .servers(List.of(
-                        new Server().url("https://deepguard-be-production.up.railway.app")
+                        new Server().url("https://delightful-charisma-production-4f29.up.railway.app")
                 ))
                 .info(new Info()
                         .title("DeepGuard Backend API")
