@@ -38,19 +38,6 @@ spring:
       max-file-size: 5MB
       max-request-size: 10MB
 
-  mail:
-    host: ${SMTP_HOST}
-    port: ${SMTP_PORT}
-    username: ${SMTP_USERNAME}
-    password: ${SMTP_PASSWORD}
-
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
 app:
   security:
     jwt:
@@ -90,3 +77,7 @@ app:
 
   ai:
     python-server-url: ${AI_PYTHON_SERVER_URL:https://squeezing-headdress-passably.ngrok-free.dev}
+
+resend:
+  api-key: ${RESEND_API_KEY}
+  from-email: ${RESEND_FROM_EMAIL:onboarding@resend.dev}
