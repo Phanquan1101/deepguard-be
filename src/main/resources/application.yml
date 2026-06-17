@@ -38,18 +38,27 @@ spring:
       max-file-size: 5MB
       max-request-size: 10MB
 
-  mail:
-    host: ${SMTP_HOST}
-    port: ${SMTP_PORT}
-    username: ${SMTP_USERNAME}
-    password: ${SMTP_PASSWORD}
+  spring:
+    mail:
+      host: ${SMTP_HOST}
+      port: ${SMTP_PORT}
+      username: ${SMTP_USERNAME}
+      password: ${SMTP_PASSWORD}
 
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
+      properties:
+        mail:
+          smtp:
+            auth: true
+
+            ssl:
+              enable: true
+
+            starttls:
+              enable: false
+
+            connectiontimeout: 5000
+            timeout: 5000
+            writetimeout: 5000
 
 app:
   security:
