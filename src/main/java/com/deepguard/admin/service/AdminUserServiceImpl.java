@@ -1,5 +1,6 @@
 package com.deepguard.admin.service;
 
+import com.deepguard.admin.dto.AdminBillingHistoryResponse;
 import com.deepguard.admin.dto.AdminUserDetailResponse;
 import com.deepguard.admin.dto.AdminUserResponse;
 import com.deepguard.admin.dto.UserStatsResponse;
@@ -8,6 +9,11 @@ import com.deepguard.auth.entity.User;
 import com.deepguard.auth.enums.UserStatus;
 import com.deepguard.auth.repository.RoleRepository;
 import com.deepguard.auth.repository.UserRepository;
+import com.deepguard.billing.entity.Payment;
+import com.deepguard.billing.entity.PricingPlan;
+import com.deepguard.billing.entity.Subscription;
+import com.deepguard.billing.enums.PaymentStatus;
+import com.deepguard.billing.repository.PaymentRepository;
 import com.deepguard.common.exception.BusinessException;
 import com.deepguard.common.exception.ErrorCode;
 import com.deepguard.common.response.PageResponse;
@@ -16,15 +22,17 @@ import com.deepguard.scan.entity.ScanJob;
 import com.deepguard.scan.repository.ScanJobRepository;
 import com.deepguard.user.entity.UserProfile;
 import com.deepguard.user.repository.UserProfileRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +44,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final RoleRepository roleRepository;
     private final ScanJobRepository scanJobRepository;
     private final MediaFileRepository mediaFileRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -143,6 +152,83 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .deletedUsers(deleted)
                 .pendingVerificationUsers(pending)
                 .totalAdmins(admins)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<AdminBillingHistoryResponse> getAllBillingHistory(
+            String keyword,
+            PaymentStatus status,
+            String paymentMethod,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Pageable pageable) {
+        log.info("Admin fetching billing history with keyword: {}, status: {}, paymentMethod: {}, startDate: {}, endDate: {}",
+                keyword, status, paymentMethod, startDate, endDate);
+
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "startDate must be before or equal to endDate");
+        }
+
+        Pageable effectivePageable = pageable;
+        if (pageable.getSort().isUnsorted()) {
+            effectivePageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(Sort.Direction.DESC, "createdAt"));
+        }
+
+        Page<AdminBillingHistoryResponse> paymentPage = paymentRepository.findAllWithAdminFilters(
+                        normalize(keyword),
+                        status,
+                        normalize(paymentMethod),
+                        startDate,
+                        endDate,
+                        effectivePageable)
+                .map(this::mapToAdminBillingHistoryResponse);
+
+        return PageResponse.<AdminBillingHistoryResponse>builder()
+                .content(paymentPage.getContent())
+                .page(paymentPage.getNumber())
+                .size(paymentPage.getSize())
+                .totalElements(paymentPage.getTotalElements())
+                .totalPages(paymentPage.getTotalPages())
+                .last(paymentPage.isLast())
+                .build();
+    }
+
+    private String normalize(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private AdminBillingHistoryResponse mapToAdminBillingHistoryResponse(Payment payment) {
+        User user = payment.getUser();
+        Subscription subscription = payment.getSubscription();
+        PricingPlan pricingPlan = subscription != null ? subscription.getPricingPlan() : null;
+
+        return AdminBillingHistoryResponse.builder()
+                .paymentId(payment.getId())
+                .transactionCode(payment.getTransactionCode())
+                .amount(payment.getAmount())
+                .paymentMethod(payment.getPaymentMethod())
+                .status(payment.getStatus())
+                .createdAt(payment.getCreatedAt())
+                .userId(user != null ? user.getId() : null)
+                .userEmail(user != null ? user.getEmail() : null)
+                .username(user != null ? user.getUsername() : null)
+                .subscriptionId(subscription != null ? subscription.getId() : null)
+                .subscriptionStatus(subscription != null ? subscription.getStatus() : null)
+                .subscriptionStartDate(subscription != null ? subscription.getStartDate() : null)
+                .subscriptionEndDate(subscription != null ? subscription.getEndDate() : null)
+                .pricingPlanId(pricingPlan != null ? pricingPlan.getId() : null)
+                .pricingPlanName(pricingPlan != null ? pricingPlan.getName() : null)
+                .credits(pricingPlan != null ? pricingPlan.getCredits() : null)
                 .build();
     }
 
