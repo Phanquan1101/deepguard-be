@@ -14,6 +14,7 @@ import com.deepguard.media.enums.UploadStatus;
 import com.deepguard.media.mapper.ToMediaFileMapper;
 import com.deepguard.media.repository.MediaFileRepository;
 import com.deepguard.scan.dto.response.AIDetectResponse;
+import com.deepguard.scan.dto.response.HiveDetectionResult;
 import com.deepguard.scan.service.ScanJobService;
 import com.deepguard.scan.service.ScanJobServiceImpl;
 import com.deepguard.security.userdetails.CustomUserDetails;
@@ -70,6 +71,10 @@ public class MediaFileServiceImpl implements MediaFileService {
 
         if (fileType == FileType.IMAGE) {
             userCreditService.validateEnoughCredits(currentUser, ActionType.IMAGE_SCAN);
+        } else if (fileType == FileType.VIDEO) {
+            userCreditService.validateEnoughCredits(currentUser, ActionType.VIDEO_SCAN);
+        } else if (fileType == FileType.AUDIO) {
+            userCreditService.validateEnoughCredits(currentUser, ActionType.AUDIO_SCAN);
         }
 
         String publicUrl = null;
@@ -94,13 +99,22 @@ public class MediaFileServiceImpl implements MediaFileService {
             // CONSUME CREDIT AFTER SUCCESSFUL UPLOAD
             if (fileType == FileType.IMAGE) {
                 userCreditService.consumeCredits(currentUser, ActionType.IMAGE_SCAN);
+            } else if (fileType == FileType.VIDEO) {
+                userCreditService.consumeCredits(currentUser, ActionType.VIDEO_SCAN);
+            } else if (fileType == FileType.AUDIO) {
+                userCreditService.consumeCredits(currentUser, ActionType.AUDIO_SCAN);
             }
 
             // AI DETECT
             AIDetectResponse aiResponse = null;
+            HiveDetectionResult hiveResult = null;
 
             if (fileType == FileType.IMAGE) {
                 aiResponse = scanJobService.createScanJobAndResult(savedMediaFile, publicUrl, currentUser);
+            } else if (fileType == FileType.VIDEO) {
+                hiveResult = scanJobService.createVideoScanJobAndResult(savedMediaFile, publicUrl, currentUser);
+            } else if (fileType == FileType.AUDIO) {
+                hiveResult = scanJobService.createAudioScanJobAndResult(savedMediaFile, publicUrl, currentUser);
             }
 
             return MediaFileResponse.builder()
@@ -112,6 +126,7 @@ public class MediaFileServiceImpl implements MediaFileService {
                     .fileSize(savedMediaFile.getFileSize())
                     .uploadedAt(savedMediaFile.getUploadedAt())
                     .aiDetect(aiResponse)
+                    .hiveDetect(hiveResult)
                     .build();
 
         } catch (Exception e) {
@@ -121,6 +136,10 @@ public class MediaFileServiceImpl implements MediaFileService {
             // REFUND IF CREDIT ALREADY CONSUMED
             if (fileType == FileType.IMAGE) {
                 userCreditService.refundCredit(currentUser, ActionType.IMAGE_SCAN);
+            } else if (fileType == FileType.VIDEO) {
+                userCreditService.refundCredit(currentUser, ActionType.VIDEO_SCAN);
+            } else if (fileType == FileType.AUDIO) {
+                userCreditService.refundCredit(currentUser, ActionType.AUDIO_SCAN);
             }
             throw new RuntimeException("Upload or AI detection failed", e);
         }

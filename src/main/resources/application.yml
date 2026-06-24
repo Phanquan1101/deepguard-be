@@ -35,8 +35,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 10MB
+      max-file-size: 100MB
+      max-request-size: 110MB
 
 app:
   security:
@@ -78,6 +78,13 @@ app:
   ai:
     python-server-url: ${AI_PYTHON_SERVER_URL:https://squeezing-headdress-passably.ngrok-free.dev}
 
+  hive:
+    api-key: ${HIVE_API_KEY}
+    model-name: ${HIVE_MODEL_NAME:ai-generated-and-deepfake-content-detection}
+    base-url: ${HIVE_BASE_URL:https://api.thehive.ai/api/v3}
+    timeout-ms: ${HIVE_TIMEOUT_MS:30000}
+    threshold: ${HIVE_THRESHOLD:0.9}
+
 resend:
-  api-key: ${RESEND_API_KEY}
+  api-key: ${RESEND_API_KEY:}
   from-email: ${RESEND_FROM_EMAIL:noreply@deep-guard.xyz}

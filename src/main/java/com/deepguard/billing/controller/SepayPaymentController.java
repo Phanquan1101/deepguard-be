@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/billing/payments/sepay")
 @RequiredArgsConstructor
-public class SepayPaymentController {
+public class    SepayPaymentController {
 
     private final SepayPaymentService sepayPaymentService;
 
