@@ -31,4 +31,10 @@ public class DetectionResultController {
         return ResponseEntity.ok(ApiResponse.success("Get detection result successfully", result));
     }
 
+    @GetMapping("/by-id/{detectionResultId}")
+    public ResponseEntity<ApiResponse<DetectionResultResponse>> getDetailDetectionResultByResultId(@PathVariable String detectionResultId) {
+        DetectionResultResponse result = detectionResultService.getDetailDetectionResultByResultId(detectionResultId);
+        return ResponseEntity.ok(ApiResponse.success("Get detection result successfully", result));
+    }
+
 }
