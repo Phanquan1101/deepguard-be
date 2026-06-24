@@ -22,8 +22,13 @@ import com.deepguard.scan.entity.ScanJob;
 import com.deepguard.scan.repository.ScanJobRepository;
 import com.deepguard.user.entity.UserProfile;
 import com.deepguard.user.repository.UserProfileRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +36,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -179,13 +185,10 @@ public class AdminUserServiceImpl implements AdminUserService {
                     Sort.by(Sort.Direction.DESC, "createdAt"));
         }
 
-        Page<AdminBillingHistoryResponse> paymentPage = paymentRepository.findAllWithAdminFilters(
-                        normalize(keyword),
-                        status,
-                        normalize(paymentMethod),
-                        startDate,
-                        endDate,
-                        effectivePageable)
+        Specification<Payment> specification = buildBillingHistorySpecification(
+                normalize(keyword), normalize(paymentMethod), status, startDate, endDate);
+
+        Page<AdminBillingHistoryResponse> paymentPage = paymentRepository.findAll(specification, effectivePageable)
                 .map(this::mapToAdminBillingHistoryResponse);
 
         return PageResponse.<AdminBillingHistoryResponse>builder()
@@ -196,6 +199,51 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .totalPages(paymentPage.getTotalPages())
                 .last(paymentPage.isLast())
                 .build();
+    }
+
+    private Specification<Payment> buildBillingHistorySpecification(
+            String keyword,
+            String paymentMethod,
+            PaymentStatus status,
+            LocalDateTime startDate,
+            LocalDateTime endDate) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (keyword != null) {
+                Join<Payment, User> user = root.join("user", JoinType.LEFT);
+                String keywordPattern = "%" + keyword.toLowerCase(Locale.ROOT) + "%";
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.<String>get("transactionCode")), keywordPattern),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(user.<String>get("email")), keywordPattern),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(user.<String>get("username")), keywordPattern)));
+            }
+
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+
+            if (paymentMethod != null) {
+                predicates.add(criteriaBuilder.equal(
+                        criteriaBuilder.lower(root.<String>get("paymentMethod")),
+                        paymentMethod.toLowerCase(Locale.ROOT)));
+            }
+
+            if (startDate != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                        root.<LocalDateTime>get("createdAt"), startDate));
+            }
+
+            if (endDate != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(
+                        root.<LocalDateTime>get("createdAt"), endDate));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
+        };
     }
 
     private String normalize(String value) {

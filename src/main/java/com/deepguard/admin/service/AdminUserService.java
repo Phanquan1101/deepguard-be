@@ -7,7 +7,6 @@ import com.deepguard.admin.dto.UserStatsResponse;
 import com.deepguard.billing.enums.PaymentStatus;
 import com.deepguard.common.response.PageResponse;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 public interface AdminUserService {
