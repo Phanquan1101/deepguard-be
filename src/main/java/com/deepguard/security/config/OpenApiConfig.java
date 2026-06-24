@@ -19,9 +19,9 @@ public class OpenApiConfig {
         final String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
-//                .servers(List.of(
-//                        new Server().url("https://delightful-charisma-production-4f29.up.railway.app")
-//                ))
+               .servers(List.of(
+                       new Server().url("https://delightful-charisma-production-4f29.up.railway.app")
+              ))
                 .info(new Info()
                         .title("DeepGuard Backend API")
                         .version("v1"))
