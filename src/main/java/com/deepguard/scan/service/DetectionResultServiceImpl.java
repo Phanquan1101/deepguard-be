@@ -105,6 +105,18 @@ public class DetectionResultServiceImpl implements DetectionResultService {
         return mapToResponse(detectionResult);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public DetectionResultResponse getDetailDetectionResultByResultId(String detectionResultId) {
+        User currentUser = getCurrentAuthenticatedUser();
+        DetectionResult detectionResult = detectionResultRepository.findById(detectionResultId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.DETECTION_RESULT_NOT_FOUND));
+        if (!detectionResult.getScanJob().getUser().getId().equals(currentUser.getId())) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+        return mapToResponse(detectionResult);
+    }
+
     private DetectionResultResponse mapToResponse(DetectionResult detection) {
 
         ScanJob scanJob = detection.getScanJob();
