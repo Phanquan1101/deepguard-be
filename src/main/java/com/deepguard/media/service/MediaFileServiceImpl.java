@@ -78,6 +78,7 @@ public class MediaFileServiceImpl implements MediaFileService {
         }
 
         String publicUrl = null;
+        boolean creditConsumed = false;
 
         try {
             // UPLOAD FILE
@@ -104,6 +105,7 @@ public class MediaFileServiceImpl implements MediaFileService {
             } else if (fileType == FileType.AUDIO) {
                 userCreditService.consumeCredits(currentUser, ActionType.AUDIO_SCAN);
             }
+            creditConsumed = true;
 
             // AI DETECT
             AIDetectResponse aiResponse = null;
@@ -133,13 +135,15 @@ public class MediaFileServiceImpl implements MediaFileService {
 
             log.error("Upload or AI detection failed: {}", e.getMessage());
 
-            // REFUND IF CREDIT ALREADY CONSUMED
-            if (fileType == FileType.IMAGE) {
-                userCreditService.refundCredit(currentUser, ActionType.IMAGE_SCAN);
-            } else if (fileType == FileType.VIDEO) {
-                userCreditService.refundCredit(currentUser, ActionType.VIDEO_SCAN);
-            } else if (fileType == FileType.AUDIO) {
-                userCreditService.refundCredit(currentUser, ActionType.AUDIO_SCAN);
+            // REFUND ONLY IF CREDIT WAS ALREADY CONSUMED
+            if (creditConsumed) {
+                if (fileType == FileType.IMAGE) {
+                    userCreditService.refundCredit(currentUser, ActionType.IMAGE_SCAN);
+                } else if (fileType == FileType.VIDEO) {
+                    userCreditService.refundCredit(currentUser, ActionType.VIDEO_SCAN);
+                } else if (fileType == FileType.AUDIO) {
+                    userCreditService.refundCredit(currentUser, ActionType.AUDIO_SCAN);
+                }
             }
             throw new RuntimeException("Upload or AI detection failed", e);
         }
