@@ -15,6 +15,7 @@ public enum ErrorCode {
 
     UNAUTHORIZED("UNAUTHORIZED", "Authentication is required", HttpStatus.UNAUTHORIZED),
     ACCESS_DENIED("ACCESS_DENIED", "You do not have permission to access this resource", HttpStatus.FORBIDDEN),
+    AUTHENTICATION_RATE_LIMITED("AUTHENTICATION_RATE_LIMITED", "Too many authentication attempts. Please try again later", HttpStatus.TOO_MANY_REQUESTS),
 
     EMAIL_ALREADY_EXISTS("EMAIL_ALREADY_EXISTS", "Email already exists", HttpStatus.CONFLICT),
     USERNAME_ALREADY_EXISTS("USERNAME_ALREADY_EXISTS", "Username already exists", HttpStatus.CONFLICT),

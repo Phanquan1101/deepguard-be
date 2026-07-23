@@ -24,12 +24,10 @@ public class CorsConfig {
                 .toList();
 
         CorsConfiguration configuration = new CorsConfiguration();
-        // If a single wildcard origin is provided, allow any origin via patterns
-        if (origins.size() == 1 && "*".equals(origins.get(0))) {
-            configuration.setAllowedOriginPatterns(List.of("*"));
-        } else {
-            configuration.setAllowedOriginPatterns(origins);
+        if (origins.isEmpty() || origins.contains("*")) {
+            throw new IllegalStateException("CORS_ALLOWED_ORIGINS must contain explicit trusted origins when credentials are enabled");
         }
+        configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
         configuration.setExposedHeaders(List.of("Authorization"));

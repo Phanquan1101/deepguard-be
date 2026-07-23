@@ -9,7 +9,11 @@ public interface RefreshTokenService {
 
     RefreshToken verifyRefreshToken(String token);
 
-    void revokeRefreshToken(String token);
+    RefreshToken rotateRefreshToken(String token);
+
+    void revokeRefreshToken(String token, String userId);
+
+    void revokeAllRefreshTokens(String userId);
 
     boolean isExpired(RefreshToken refreshToken);
 }

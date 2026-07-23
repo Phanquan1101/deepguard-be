@@ -4,6 +4,7 @@ import com.deepguard.auth.dto.request.EmailVerificationRequest;
 import com.deepguard.auth.dto.response.EmailVerificationResponse;
 import com.deepguard.auth.service.EmailVerificationService;
 import com.deepguard.common.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +20,7 @@ public class VerifyController {
     private final EmailVerificationService emailVerificationService;
 
     @PostMapping("/email")
-    public ResponseEntity<ApiResponse<EmailVerificationResponse>> verifyEmail(@RequestBody EmailVerificationRequest request) {
+    public ResponseEntity<ApiResponse<EmailVerificationResponse>> verifyEmail(@Valid @RequestBody EmailVerificationRequest request) {
         EmailVerificationResponse emailVerificationResponse = emailVerificationService.verifyEmail(request);
         return ResponseEntity.ok(ApiResponse.<EmailVerificationResponse>builder()
                 .code("200")

@@ -26,6 +26,9 @@ public class RefreshToken {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String token;
 
+    @Transient
+    private String rawToken;
+
     @Column(name = "expired_at", nullable = false)
     private LocalDateTime expiredAt;
 

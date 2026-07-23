@@ -21,8 +21,6 @@ import java.time.LocalDateTime;
 public class AdminAccountInitializer implements CommandLineRunner {
 
     private static final String ADMIN_ROLE = "ADMIN";
-    private static final String DEFAULT_FALLBACK_PASSWORD = "Admin123@";
-
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -39,6 +37,11 @@ public class AdminAccountInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
+        if (isBlank(defaultAdminEmail) || isBlank(defaultAdminUsername) || isBlank(defaultAdminPassword)) {
+            log.warn("Default admin was not created because DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_USERNAME, and DEFAULT_ADMIN_PASSWORD must all be configured");
+            return;
+        }
+
         if (userRepository.existsByEmail(defaultAdminEmail)) {
             log.info("Default admin already exists: {}", defaultAdminEmail);
             return;
@@ -48,10 +51,6 @@ public class AdminAccountInitializer implements CommandLineRunner {
         if (adminRole == null) {
             log.warn("Cannot create default admin because role '{}' was not found", ADMIN_ROLE);
             return;
-        }
-
-        if (DEFAULT_FALLBACK_PASSWORD.equals(defaultAdminPassword)) {
-            log.warn("Default admin password is using fallback value. Please change it in production.");
         }
 
         User admin = User.builder()
@@ -67,5 +66,9 @@ public class AdminAccountInitializer implements CommandLineRunner {
 
         userRepository.save(admin);
         log.info("Default admin created: {}", defaultAdminEmail);
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }

@@ -24,10 +24,12 @@ public class AuthMapper {
                 .build();
     }
 
-    public AuthResponse toAuthResponse(String accessToken, String refreshToken) {
+    public AuthResponse toAuthResponse(String accessToken, String refreshToken, long expiresIn) {
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(expiresIn)
                 .build();
     }
 

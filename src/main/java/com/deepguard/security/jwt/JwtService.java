@@ -61,6 +61,10 @@ public class JwtService {
             String username = extractUsername(token);
             return username != null
                     && username.equals(userDetails.getUsername())
+                    && userDetails.isEnabled()
+                    && userDetails.isAccountNonLocked()
+                    && userDetails.isAccountNonExpired()
+                    && userDetails.isCredentialsNonExpired()
                     && !isTokenExpired(token);
         } catch (Exception ex) {
             return false;

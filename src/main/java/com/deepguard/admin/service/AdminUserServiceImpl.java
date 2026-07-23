@@ -9,6 +9,7 @@ import com.deepguard.auth.entity.User;
 import com.deepguard.auth.enums.UserStatus;
 import com.deepguard.auth.repository.RoleRepository;
 import com.deepguard.auth.repository.UserRepository;
+import com.deepguard.auth.service.RefreshTokenService;
 import com.deepguard.billing.entity.Payment;
 import com.deepguard.billing.entity.PricingPlan;
 import com.deepguard.billing.entity.Subscription;
@@ -51,6 +52,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final ScanJobRepository scanJobRepository;
     private final MediaFileRepository mediaFileRepository;
     private final PaymentRepository paymentRepository;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     @Transactional(readOnly = true)
@@ -124,6 +126,10 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         user.setStatus(status);
         userRepository.save(user);
+
+        if (!UserStatus.ACTIVE.name().equals(status)) {
+            refreshTokenService.revokeAllRefreshTokens(userId);
+        }
     }
 
     @Override
