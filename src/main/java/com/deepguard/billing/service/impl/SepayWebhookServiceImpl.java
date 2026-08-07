@@ -203,7 +203,7 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
         PricingPlan pricingPlan = subscription.getPricingPlan();
         User user = payment.getUser();
 
-        UserCredit userCredit = userCreditRepository.findByUser_IdForUpdate(user.getId())
+        UserCredit userCredit = userCreditRepository.findByUserIdForUpdate(user.getId())
                 .orElseGet(() -> UserCredit.builder()
                         .user(user)
                         .remainingCredits(0)
