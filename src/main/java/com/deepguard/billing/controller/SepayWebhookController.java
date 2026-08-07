@@ -29,16 +29,17 @@ public class SepayWebhookController {
     ) {
         String signatureHeader = findHeaderIgnoreCase(headers, "signature", "x-sepay-signature", "x-signature");
         String timestampHeader = findHeaderIgnoreCase(headers, "timestamp", "x-sepay-timestamp", "x-timestamp");
-        String authorizationHeader = findHeaderIgnoreCase(headers, "authorization");
-
-        log.info("SePay webhook received: rawBody={}", rawBody);
-        log.info("SePay webhook headers: signature={}, timestamp={}, authorization={}",
-                signatureHeader, timestampHeader, authorizationHeader);
+        log.info("SePay webhook received: payloadLength={}, hasSignature={}, hasTimestamp={}",
+                rawBody.length(), signatureHeader != null, timestampHeader != null);
 
         SepayWebhookResponse response = sepayWebhookService.handleWebhook(rawBody, signatureHeader, timestampHeader);
         if ("97".equals(response.getCode())) {
+            response.setSuccess(false);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
+
+        // SePay treats a 2xx response as completed only when success is true.
+        response.setSuccess("00".equals(response.getCode()));
         return ResponseEntity.ok(response);
     }
 

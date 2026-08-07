@@ -28,6 +28,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -39,6 +41,7 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
 
     private static final String PAYMENT_METHOD_SEPAY = "SEPAY";
     private static final String HMAC_SHA256 = "HmacSHA256";
+    private static final Duration MAX_TIMESTAMP_SKEW = Duration.ofMinutes(5);
 
     private final ObjectMapper objectMapper;
     private final SepayProperties sepayProperties;
@@ -50,11 +53,11 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
     @Override
     @Transactional
     public SepayWebhookResponse handleWebhook(String rawBody, String signatureHeader, String timestampHeader) {
-        log.info("Handling SePay webhook: signature={}, timestamp={}", signatureHeader, timestampHeader);
-        // TODO: verify timestamp freshness to reduce replay risk in a later iteration.
+        log.info("Handling SePay webhook with timestamp={}", timestampHeader);
 
-        if (!verifySignature(rawBody, signatureHeader, timestampHeader)) {
-            log.warn("SePay webhook signature invalid");
+        if (!verifySignature(rawBody, signatureHeader, timestampHeader)
+                || !isTimestampFresh(timestampHeader)) {
+            log.warn("SePay webhook authentication failed");
             return SepayWebhookResponse.builder()
                     .code("97")
                     .message("Invalid signature")
@@ -147,7 +150,7 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
         }
 
         Payment pendingPayment = findByNormalizedContent(normalizedContent,
-                paymentRepository.findByPaymentMethodAndStatus(PAYMENT_METHOD_SEPAY, PaymentStatus.PENDING));
+                paymentRepository.findByPaymentMethodAndStatusForUpdate(PAYMENT_METHOD_SEPAY, PaymentStatus.PENDING));
         if (pendingPayment != null) {
             return pendingPayment;
         }
@@ -200,7 +203,7 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
         PricingPlan pricingPlan = subscription.getPricingPlan();
         User user = payment.getUser();
 
-        UserCredit userCredit = userCreditRepository.findByUser_Id(user.getId())
+        UserCredit userCredit = userCreditRepository.findByUser_IdForUpdate(user.getId())
                 .orElseGet(() -> UserCredit.builder()
                         .user(user)
                         .remainingCredits(0)
@@ -249,6 +252,16 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
                 expected.getBytes(StandardCharsets.UTF_8),
                 actual.getBytes(StandardCharsets.UTF_8)
         );
+    }
+
+    private boolean isTimestampFresh(String timestampHeader) {
+        try {
+            long timestampSeconds = Long.parseLong(timestampHeader.trim());
+            Instant signedAt = Instant.ofEpochSecond(timestampSeconds);
+            return Duration.between(signedAt, Instant.now()).abs().compareTo(MAX_TIMESTAMP_SKEW) <= 0;
+        } catch (RuntimeException ex) {
+            return false;
+        }
     }
 
     private String hmacSha256Hex(String secretKey, String data) {

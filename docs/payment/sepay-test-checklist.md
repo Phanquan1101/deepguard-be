@@ -2,14 +2,8 @@
 
 ## 1. Environment
 
-- Backend local:
-  `http://localhost:8080`
-
-- Ngrok:
-  `https://<ngrok-domain>`
-
 - SePay webhook URL:
-  `https://<ngrok-domain>/api/billing/payments/sepay/webhook`
+  `https://deepguard-be-production.up.railway.app/api/billing/payments/sepay/webhook`
 
 - Required ENV:
   `SEPAY_WEBHOOK_SECRET`
@@ -27,27 +21,26 @@
 - Event type: money in
 - Format: JSON
 - Security: HMAC-SHA256
-- Webhook URL points to current ngrok URL
+- Webhook URL points to the Railway production URL
 
 ## 3. Happy Path
 
 1. Run backend.
-2. Run ngrok.
-3. Login user.
-4. GET `/api/billing/pricing-plans`.
-5. POST `/api/billing/payments/sepay/create`.
-6. Copy `qrUrl`.
-7. Scan QR with banking app.
-8. Transfer exact amount.
-9. Transfer content must contain `transactionCode`.
-10. Wait for SePay webhook.
-11. Check DB:
+2. Login user.
+3. GET `/api/billing/pricing-plans`.
+4. POST `/api/billing/payments/sepay/create`.
+5. Copy `qrUrl`.
+6. Scan QR with banking app.
+7. Transfer exact amount.
+8. Transfer content must contain `transactionCode`.
+9. Wait for SePay webhook.
+10. Check DB:
     - `payments.status = SUCCESS`
     - `subscriptions.status = ACTIVE`
     - `credit_credits.remaining_credits` increased
     - `credit_transactions` has `PURCHASE`
-12. GET `/api/billing/payments/{paymentId}`.
-13. Expected `status = SUCCESS`.
+11. GET `/api/billing/payments/{paymentId}`.
+12. Expected `status = SUCCESS`.
 
 ## 4. Duplicate Webhook
 

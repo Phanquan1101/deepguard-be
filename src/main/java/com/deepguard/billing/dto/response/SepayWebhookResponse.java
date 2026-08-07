@@ -13,6 +13,9 @@ import lombok.Setter;
 @Builder
 public class SepayWebhookResponse {
 
+    @Builder.Default
+    private boolean success = false;
+
     private String code;
     private String message;
 }
