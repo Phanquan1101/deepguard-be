@@ -23,6 +23,27 @@ public interface PaymentRepository extends JpaRepository<Payment, String>, JpaSp
 
     List<Payment> findByPaymentMethodAndStatus(String paymentMethod, PaymentStatus status);
 
+    /**
+     * Finds a completed purchase whose subscription is still within its paid
+     * period. This is also used to recover subscriptions created before the
+     * payment webhook finished updating their status.
+     */
+    @Query("""
+            select p
+            from Payment p
+            join fetch p.subscription subscription
+            join fetch subscription.pricingPlan
+            where p.user.id = :userId
+              and p.status = :status
+              and subscription.endDate > :now
+            order by subscription.endDate desc, p.createdAt desc
+            """)
+    List<Payment> findSuccessfulPaymentsWithUnexpiredSubscription(
+            @Param("userId") String userId,
+            @Param("status") PaymentStatus status,
+            @Param("now") java.time.LocalDateTime now,
+            Pageable pageable);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
             select p
