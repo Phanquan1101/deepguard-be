@@ -2,7 +2,7 @@ package com.deepguard.media.mapper;
 
 import com.deepguard.media.dto.response.MediaFileResponse;
 import com.deepguard.media.entity.MediaFile;
-import com.deepguard.scan.dto.response.AIDetectResponse;
+import com.deepguard.scan.dto.response.HiveDetectionResult;
 import com.deepguard.scan.entity.DetectionResult;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -16,7 +16,7 @@ public class ToMediaFileMapper {
     private final EntityManager entityManager;
 
     public MediaFileResponse mapToMediaFileResponse(MediaFile mediaFile) {
-        AIDetectResponse aiDetect = null;
+        HiveDetectionResult detection = null;
 
         // Try to load the latest detection result for this media (if any)
         try {
@@ -27,11 +27,9 @@ public class ToMediaFileMapper {
                     .getSingleResult();
 
             if (dr != null) {
-                aiDetect = AIDetectResponse.builder()
-                        .prediction(dr.getResultLabel() != null ? dr.getResultLabel().name().toLowerCase() : null)
-                        .realProbability(dr.getConfidence() != null ? dr.getConfidence().doubleValue() : null)
-                        .imageUrl(null)
-                        .message(dr.getModelVersion())
+                detection = HiveDetectionResult.builder()
+                        .prediction(dr.getResultLabel() != null ? dr.getResultLabel().name() : null)
+                        .confidence(dr.getConfidence() != null ? dr.getConfidence().doubleValue() : null)
                         .build();
             }
         } catch (NoResultException ignored) {
@@ -46,7 +44,7 @@ public class ToMediaFileMapper {
                 .fileType(mediaFile.getFileType().name())
                 .fileSize(mediaFile.getFileSize())
                 .uploadedAt(mediaFile.getUploadedAt())
-                .aiDetect(aiDetect)
+                .detection(detection)
                 .build();
     }
 

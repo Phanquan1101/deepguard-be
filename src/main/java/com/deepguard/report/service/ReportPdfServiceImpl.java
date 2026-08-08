@@ -114,7 +114,7 @@ public class ReportPdfServiceImpl implements ReportPdfService {
              .fakeScore(d.getFakeScore())
              .confidence(d.getConfidence())
              .resultLabel(d.getResultLabel().name())
-             .modelVersion(d.getModelVersion())
+             .modelVersion("DeepGuard Detection Engine")
              .processedAt(d.getProcessedAt());
         }
         return b.build();

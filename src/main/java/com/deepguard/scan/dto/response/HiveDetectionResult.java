@@ -1,7 +1,7 @@
 package com.deepguard.scan.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,10 +52,12 @@ public class HiveDetectionResult {
     /** Frame-level details for videos */
     private List<FrameResult> frames;
 
-    /** Raw task ID from Hive API */
+    /** Provider task ID; retained for internal persistence only. */
+    @JsonIgnore
     private String taskId;
 
-    /** The media URL that was analyzed */
+    /** Internal source URL; MediaFileResponse already returns originalUrl. */
+    @JsonIgnore
     private String mediaUrl;
 
     @Data

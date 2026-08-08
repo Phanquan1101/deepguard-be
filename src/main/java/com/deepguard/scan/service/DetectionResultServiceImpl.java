@@ -53,7 +53,7 @@ public class DetectionResultServiceImpl implements DetectionResultService {
                             .fakeScore(detection.getFakeScore())
                             .confidence(detection.getConfidence())
                             .resultLabel(detection.getResultLabel().name())
-                            .modelVersion(detection.getModelVersion())
+                            .modelVersion("DeepGuard Detection Engine")
                             .processedAt(detection.getProcessedAt())
                             .build();
                 })
@@ -131,7 +131,7 @@ public class DetectionResultServiceImpl implements DetectionResultService {
                 .fakeScore(detection.getFakeScore())
                 .confidence(detection.getConfidence())
                 .resultLabel(detection.getResultLabel().name())
-                .modelVersion(detection.getModelVersion())
+                .modelVersion("DeepGuard Detection Engine")
                 .processedAt(detection.getProcessedAt())
                 .build();
     }

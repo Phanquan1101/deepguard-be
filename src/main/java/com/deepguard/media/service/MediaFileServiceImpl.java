@@ -13,10 +13,8 @@ import com.deepguard.media.enums.FileType;
 import com.deepguard.media.enums.UploadStatus;
 import com.deepguard.media.mapper.ToMediaFileMapper;
 import com.deepguard.media.repository.MediaFileRepository;
-import com.deepguard.scan.dto.response.AIDetectResponse;
 import com.deepguard.scan.dto.response.HiveDetectionResult;
 import com.deepguard.scan.service.ScanJobService;
-import com.deepguard.scan.service.ScanJobServiceImpl;
 import com.deepguard.security.userdetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -108,16 +106,8 @@ public class MediaFileServiceImpl implements MediaFileService {
             creditConsumed = true;
 
             // AI DETECT
-            AIDetectResponse aiResponse = null;
-            HiveDetectionResult hiveResult = null;
-
-            if (fileType == FileType.IMAGE) {
-                aiResponse = scanJobService.createScanJobAndResult(savedMediaFile, publicUrl, currentUser);
-            } else if (fileType == FileType.VIDEO) {
-                hiveResult = scanJobService.createVideoScanJobAndResult(savedMediaFile, publicUrl, currentUser);
-            } else if (fileType == FileType.AUDIO) {
-                hiveResult = scanJobService.createAudioScanJobAndResult(savedMediaFile, publicUrl, currentUser);
-            }
+            HiveDetectionResult detection = scanJobService.createMediaScanJobAndResult(
+                    savedMediaFile, publicUrl, currentUser);
 
             return MediaFileResponse.builder()
                     .id(savedMediaFile.getId())
@@ -127,8 +117,7 @@ public class MediaFileServiceImpl implements MediaFileService {
                     .fileType(savedMediaFile.getFileType().name())
                     .fileSize(savedMediaFile.getFileSize())
                     .uploadedAt(savedMediaFile.getUploadedAt())
-                    .aiDetect(aiResponse)
-                    .hiveDetect(hiveResult)
+                    .detection(detection)
                     .build();
 
         } catch (Exception e) {
