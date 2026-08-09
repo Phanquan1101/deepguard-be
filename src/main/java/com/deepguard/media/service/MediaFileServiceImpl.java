@@ -108,9 +108,16 @@ public class MediaFileServiceImpl implements MediaFileService {
             // AI DETECT
             HiveDetectionResult detection = scanJobService.createMediaScanJobAndResult(
                     savedMediaFile, publicUrl, currentUser);
+            if (detection == null) {
+                throw new BusinessException(
+                        ErrorCode.AI_SERVER_UNAVAILABLE,
+                        "Analysis could not be completed"
+                );
+            }
 
             return MediaFileResponse.builder()
                     .id(savedMediaFile.getId())
+                    .scanJobId(detection.getScanJobId())
                     .userId(savedMediaFile.getUser().getId())
                     .fileName(savedMediaFile.getFileName())
                     .originalUrl(savedMediaFile.getOriginalUrl())

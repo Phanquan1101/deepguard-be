@@ -2,6 +2,7 @@ package com.deepguard.scan.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,6 +48,7 @@ public class HiveDetectionResult {
     private String attributedGenerator;
 
     /** Whether the input is a video with multiple frames */
+    @JsonProperty("isVideo")
     private boolean isVideo;
 
     /** Frame-level details for videos */
@@ -59,6 +61,10 @@ public class HiveDetectionResult {
     /** Internal source URL; MediaFileResponse already returns originalUrl. */
     @JsonIgnore
     private String mediaUrl;
+
+    /** Internal scan job ID, surfaced by MediaFileResponse at the top level. */
+    @JsonIgnore
+    private String scanJobId;
 
     @Data
     @Builder

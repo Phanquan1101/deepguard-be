@@ -38,6 +38,27 @@ public class DetectionResult {
     @Column(name = "model_version", nullable = false)
     private String modelVersion;
 
+    @Column(name = "ai_generated_score", precision = 6, scale = 5)
+    private BigDecimal aiGeneratedScore;
+
+    @Column(name = "not_ai_generated_score", precision = 6, scale = 5)
+    private BigDecimal notAiGeneratedScore;
+
+    @Column(name = "deepfake_score", precision = 6, scale = 5)
+    private BigDecimal deepfakeScore;
+
+    @Column(name = "ai_generated_audio_score", precision = 6, scale = 5)
+    private BigDecimal aiGeneratedAudioScore;
+
+    @Column(name = "not_ai_generated_audio_score", precision = 6, scale = 5)
+    private BigDecimal notAiGeneratedAudioScore;
+
+    @Column(name = "attributed_generator")
+    private String attributedGenerator;
+
+    @Column(name = "is_video", nullable = false)
+    private boolean video;
+
     @Column(name = "processed_at", nullable = false)
     private LocalDateTime processedAt;
 

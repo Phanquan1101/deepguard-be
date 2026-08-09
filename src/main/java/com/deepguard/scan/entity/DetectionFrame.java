@@ -2,6 +2,7 @@ package com.deepguard.scan.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -27,6 +28,27 @@ public class DetectionFrame {
 
     @Column(name = "suspicion_score", nullable = false)
     private Float suspicionScore;
+
+    @Column(name = "frame_index")
+    private Integer frameIndex;
+
+    @Column(name = "ai_generated_score")
+    private BigDecimal aiGeneratedScore;
+
+    @Column(name = "not_ai_generated_score")
+    private BigDecimal notAiGeneratedScore;
+
+    @Column(name = "deepfake_score")
+    private BigDecimal deepfakeScore;
+
+    @Column(name = "attributed_generator")
+    private String attributedGenerator;
+
+    @Column(name = "ai_generated_audio_score")
+    private BigDecimal aiGeneratedAudioScore;
+
+    @Column(name = "not_ai_generated_audio_score")
+    private BigDecimal notAiGeneratedAudioScore;
 
     @Column(name = "frame_image_url")
     private String frameImageUrl;

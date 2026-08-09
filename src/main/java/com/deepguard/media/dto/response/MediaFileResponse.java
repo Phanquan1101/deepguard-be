@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class MediaFileResponse {
 
     private String id;
+    private String scanJobId;
     private String userId;
     private String fileName;
     private String originalUrl;

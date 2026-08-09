@@ -7,9 +7,11 @@ import com.deepguard.media.entity.MediaFile;
 import com.deepguard.media.enums.FileType;
 import com.deepguard.common.response.PageResponse;
 import com.deepguard.scan.repository.ScanJobRepository;
+import com.deepguard.scan.repository.DetectionFrameRepository;
 import com.deepguard.scan.dto.response.HiveDetectionResult;
 import com.deepguard.scan.dto.response.ScanJobResponse;
 import com.deepguard.scan.entity.DetectionResult;
+import com.deepguard.scan.entity.DetectionFrame;
 import com.deepguard.scan.entity.ScanJob;
 import com.deepguard.scan.enums.DetectionLabel;
 import com.deepguard.scan.enums.ScanJobStatus;
@@ -38,6 +40,7 @@ public class ScanJobServiceImpl implements ScanJobService {
 
     private final EntityManager entityManager;
     private final ScanJobRepository scanJobRepository;
+    private final DetectionFrameRepository detectionFrameRepository;
     private final HiveService hiveService;
 
     /** Creates a scan job and detection result for any supported media file. */
@@ -96,13 +99,25 @@ public class ScanJobServiceImpl implements ScanJobService {
                         .scanJob(scanJob)
                         .fakeScore(bdFakeScore)
                         .confidence(bdConfidence)
+                        .aiGeneratedScore(toScore(hiveResult.getAiGeneratedScore()))
+                        .notAiGeneratedScore(toScore(hiveResult.getNotAiGeneratedScore()))
+                        .deepfakeScore(toScore(hiveResult.getDeepfakeScore()))
+                        .aiGeneratedAudioScore(toScore(hiveResult.getAiGeneratedAudioScore()))
+                        .notAiGeneratedAudioScore(toScore(hiveResult.getNotAiGeneratedAudioScore()))
+                        .attributedGenerator(hiveResult.getAttributedGenerator())
+                        .video(hiveResult.isVideo())
                         .resultLabel(labelEnum)
                         .modelVersion("deepguard-detection-v1")
                         .processedAt(LocalDateTime.now())
                         .build();
 
                 entityManager.persist(detectionResult);
+                persistFrames(detectionResult, hiveResult);
             }
+
+            // Keep the identifier out of the detection payload itself; the
+            // upload response exposes it at the media level for direct routing.
+            hiveResult.setScanJobId(scanJob.getId());
         } catch (Exception e) {
             throw new RuntimeException("Failed to persist media scan job/result: " + e.getMessage(), e);
         }
@@ -112,6 +127,42 @@ public class ScanJobServiceImpl implements ScanJobService {
 
     private double valueOrZero(Double value) {
         return value != null ? value : 0.0;
+    }
+
+    private BigDecimal toScore(Double value) {
+        return BigDecimal.valueOf(valueOrZero(value)).setScale(5, RoundingMode.HALF_UP);
+    }
+
+    private void persistFrames(DetectionResult detectionResult, HiveDetectionResult hiveResult) {
+        if (!hiveResult.isVideo() || hiveResult.getFrames() == null || hiveResult.getFrames().isEmpty()) {
+            return;
+        }
+
+        List<DetectionFrame> frames = hiveResult.getFrames().stream()
+                .map(frame -> DetectionFrame.builder()
+                        .detectionResult(detectionResult)
+                        .frameIndex(frame.getFrameIndex())
+                        .frameTimestamp(toFloat(frame.getTimestamp()))
+                        .suspicionScore(toFloat(Math.max(
+                                valueOrZero(frame.getAiGeneratedScore()),
+                                Math.max(
+                                        valueOrZero(frame.getDeepfakeScore()),
+                                        valueOrZero(frame.getAiGeneratedAudioScore())
+                                )
+                        )))
+                        .aiGeneratedScore(toScore(frame.getAiGeneratedScore()))
+                        .notAiGeneratedScore(toScore(frame.getNotAiGeneratedScore()))
+                        .deepfakeScore(toScore(frame.getDeepfakeScore()))
+                        .attributedGenerator(frame.getAttributedGenerator())
+                        .aiGeneratedAudioScore(toScore(frame.getAiGeneratedAudioScore()))
+                        .notAiGeneratedAudioScore(toScore(frame.getNotAiGeneratedAudioScore()))
+                        .build())
+                .toList();
+        detectionFrameRepository.saveAll(frames);
+    }
+
+    private Float toFloat(Double value) {
+        return (float) valueOrZero(value);
     }
 
     private User getCurrentAuthenticatedUser() {

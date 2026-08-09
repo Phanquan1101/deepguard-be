@@ -5,10 +5,13 @@ import com.deepguard.common.exception.BusinessException;
 import com.deepguard.common.exception.ErrorCode;
 import com.deepguard.common.response.PageResponse;
 import com.deepguard.scan.dto.response.DetectionResultResponse;
+import com.deepguard.scan.dto.response.DetectionFrameResponse;
+import com.deepguard.scan.entity.DetectionFrame;
 import com.deepguard.scan.entity.DetectionResult;
 import com.deepguard.scan.entity.ScanJob;
 import com.deepguard.scan.enums.DetectionLabel;
 import com.deepguard.scan.repository.DetectionResultRepository;
+import com.deepguard.scan.repository.DetectionFrameRepository;
 import com.deepguard.security.userdetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +30,7 @@ import java.util.List;
 public class DetectionResultServiceImpl implements DetectionResultService {
 
     private final DetectionResultRepository detectionResultRepository;
+    private final DetectionFrameRepository detectionFrameRepository;
 
     private User getCurrentAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -42,21 +46,7 @@ public class DetectionResultServiceImpl implements DetectionResultService {
         User currentUser = getCurrentAuthenticatedUser();
         List<DetectionResult> detectionResultList = detectionResultRepository.findByScanJob_UserOrderByProcessedAtDesc(currentUser);
         return detectionResultList.stream()
-                .map(detection -> {
-                    ScanJob scanJob = detection.getScanJob();
-                    return DetectionResultResponse.builder()
-                            .detectionResultId(detection.getId())
-                            .scanJobId(scanJob.getId())
-                            .mediaId(scanJob.getMediaFile().getId())
-                            .fileName(scanJob.getMediaFile().getFileName())
-                            .originalUrl(scanJob.getMediaFile().getOriginalUrl())
-                            .fakeScore(detection.getFakeScore())
-                            .confidence(detection.getConfidence())
-                            .resultLabel(detection.getResultLabel().name())
-                            .modelVersion("DeepGuard Detection Engine")
-                            .processedAt(detection.getProcessedAt())
-                            .build();
-                })
+                .map(detection -> mapToResponse(detection, false))
                 .toList();
     }
 
@@ -81,7 +71,7 @@ public class DetectionResultServiceImpl implements DetectionResultService {
         }
         List<DetectionResultResponse> content = detectionPage.getContent()
                 .stream()
-                .map(this::mapToResponse)
+                .map(detection -> mapToResponse(detection, false))
                 .toList();
         return PageResponse.<DetectionResultResponse>builder()
                 .content(content)
@@ -102,7 +92,7 @@ public class DetectionResultServiceImpl implements DetectionResultService {
         if (!detectionResult.getScanJob().getUser().getId().equals(currentUser.getId())) {
             throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
-        return mapToResponse(detectionResult);
+        return mapToResponse(detectionResult, true);
     }
 
     @Transactional(readOnly = true)
@@ -114,10 +104,10 @@ public class DetectionResultServiceImpl implements DetectionResultService {
         if (!detectionResult.getScanJob().getUser().getId().equals(currentUser.getId())) {
             throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
-        return mapToResponse(detectionResult);
+        return mapToResponse(detectionResult, true);
     }
 
-    private DetectionResultResponse mapToResponse(DetectionResult detection) {
+    private DetectionResultResponse mapToResponse(DetectionResult detection, boolean includeFrames) {
 
         ScanJob scanJob = detection.getScanJob();
 
@@ -130,9 +120,38 @@ public class DetectionResultServiceImpl implements DetectionResultService {
                 .originalUrl(scanJob.getMediaFile().getOriginalUrl())
                 .fakeScore(detection.getFakeScore())
                 .confidence(detection.getConfidence())
+                .aiGeneratedScore(detection.getAiGeneratedScore())
+                .notAiGeneratedScore(detection.getNotAiGeneratedScore())
+                .deepfakeScore(detection.getDeepfakeScore())
+                .aiGeneratedAudioScore(detection.getAiGeneratedAudioScore())
+                .notAiGeneratedAudioScore(detection.getNotAiGeneratedAudioScore())
+                .attributedGenerator(detection.getAttributedGenerator())
+                .video(detection.isVideo())
+                .frames(includeFrames ? getFrames(detection.getId()) : List.of())
                 .resultLabel(detection.getResultLabel().name())
                 .modelVersion("DeepGuard Detection Engine")
                 .processedAt(detection.getProcessedAt())
+                .build();
+    }
+
+    private List<DetectionFrameResponse> getFrames(String detectionResultId) {
+        return detectionFrameRepository.findByDetectionResult_IdOrderByFrameIndexAsc(detectionResultId)
+                .stream()
+                .map(this::mapFrame)
+                .toList();
+    }
+
+    private DetectionFrameResponse mapFrame(DetectionFrame frame) {
+        return DetectionFrameResponse.builder()
+                .frameIndex(frame.getFrameIndex())
+                .timestamp(frame.getFrameTimestamp() != null ? frame.getFrameTimestamp().doubleValue() : 0.0)
+                .suspicionScore(frame.getSuspicionScore() != null ? frame.getSuspicionScore().doubleValue() : 0.0)
+                .aiGeneratedScore(frame.getAiGeneratedScore() != null ? frame.getAiGeneratedScore().doubleValue() : 0.0)
+                .notAiGeneratedScore(frame.getNotAiGeneratedScore() != null ? frame.getNotAiGeneratedScore().doubleValue() : 0.0)
+                .deepfakeScore(frame.getDeepfakeScore() != null ? frame.getDeepfakeScore().doubleValue() : 0.0)
+                .attributedGenerator(frame.getAttributedGenerator())
+                .aiGeneratedAudioScore(frame.getAiGeneratedAudioScore() != null ? frame.getAiGeneratedAudioScore().doubleValue() : 0.0)
+                .notAiGeneratedAudioScore(frame.getNotAiGeneratedAudioScore() != null ? frame.getNotAiGeneratedAudioScore().doubleValue() : 0.0)
                 .build();
     }
 }
