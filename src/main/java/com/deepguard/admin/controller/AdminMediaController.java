@@ -2,6 +2,8 @@ package com.deepguard.admin.controller;
 
 import com.deepguard.common.response.ApiResponse;
 import com.deepguard.common.response.PageResponse;
+import com.deepguard.admin.dto.AdminAnalyticsResponse;
+import com.deepguard.admin.service.AdminAnalyticsService;
 import com.deepguard.media.dto.response.AdminMediaResponse;
 import com.deepguard.media.service.MediaFileService;
 import com.deepguard.scan.dto.response.DetectionResultResponse;
@@ -29,6 +31,15 @@ public class AdminMediaController {
     private final MediaFileService mediaFileService;
     private final ScanJobService scanJobService;
     private final DetectionResultService detectionResultService;
+    private final AdminAnalyticsService adminAnalyticsService;
+
+    @GetMapping("/analytics")
+    public ResponseEntity<ApiResponse<AdminAnalyticsResponse>> getAnalytics() {
+        return ResponseEntity.ok(ApiResponse.success(
+                "Get admin analytics successfully",
+                adminAnalyticsService.getAnalytics()
+        ));
+    }
 
     @GetMapping("/media/all")
     public ResponseEntity<ApiResponse<PageResponse<AdminMediaResponse>>> getAllMedia(
