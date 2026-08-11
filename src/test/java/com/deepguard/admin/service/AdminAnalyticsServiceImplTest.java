@@ -40,6 +40,8 @@ class AdminAnalyticsServiceImplTest {
         );
         when(scanJobRepository.count()).thenReturn(12L);
         when(mediaFileRepository.count()).thenReturn(9L);
+        when(mediaFileRepository.countByFileTypeForAdminAnalytics())
+                .thenReturn(List.<Object[]>of(new Object[]{"IMAGE", 7L}, new Object[]{"VIDEO", 2L}));
         when(scanJobRepository.countByStatusForAdminAnalytics()).thenReturn(List.<Object[]>of(
                 new Object[]{ScanJobStatus.COMPLETED, 10L},
                 new Object[]{ScanJobStatus.FAILED, 2L}
@@ -65,6 +67,7 @@ class AdminAnalyticsServiceImplTest {
         assertThat(first).isSameAs(second);
         assertThat(first.totalScanJobs()).isEqualTo(12L);
         assertThat(first.totalMediaFiles()).isEqualTo(9L);
+        assertThat(first.mediaTypeCounts()).containsEntry("IMAGE", 7L);
         assertThat(first.scanJobStatusCounts())
                 .containsEntry(ScanJobStatus.COMPLETED.name(), 10L)
                 .containsEntry(ScanJobStatus.FAILED.name(), 2L)

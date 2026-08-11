@@ -13,6 +13,7 @@ import java.util.Map;
 public record AdminAnalyticsResponse(
         long totalScanJobs,
         long totalMediaFiles,
+        Map<String, Long> mediaTypeCounts,
         Map<String, Long> scanJobStatusCounts,
         long totalTransactions,
         BigDecimal totalRevenue,

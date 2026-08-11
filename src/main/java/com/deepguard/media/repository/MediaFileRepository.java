@@ -51,4 +51,7 @@ public interface MediaFileRepository extends JpaRepository<MediaFile, String> {
     MediaFile findByIdAndUserId(String id, String userId);
 
     long countByUserId(String userId);
+
+    @Query("select media.fileType, count(media) from MediaFile media group by media.fileType")
+    List<Object[]> countByFileTypeForAdminAnalytics();
 }

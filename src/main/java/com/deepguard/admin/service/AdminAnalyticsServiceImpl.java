@@ -85,6 +85,7 @@ public class AdminAnalyticsServiceImpl implements AdminAnalyticsService {
         return new AdminAnalyticsResponse(
                 scanJobRepository.count(),
                 mediaFileRepository.count(),
+                toCountMap(mediaFileRepository.countByFileTypeForAdminAnalytics()),
                 scanStatusCounts,
                 paymentRepository.count(),
                 totalRevenue != null ? totalRevenue : BigDecimal.ZERO,
